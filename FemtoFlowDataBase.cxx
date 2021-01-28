@@ -30,8 +30,8 @@ FemtoFlowDataBase::FemtoFlowDataBase( int pdg, const char* tableName, double ene
 {
   kServer = TSQLServer::Connect("mysql://localhost/flow","vm","P4$$w0rd"); //connect to the database
   // kFlow = new TF1(Form("flow_%d",pdg), flowHarmonics, 0, TMath::TwoPi(), 4); //create function for flowharmonics
-  kFlow = new TF1(Form("flow_%d",pdg), flowHarmonics, 0, TMath::TwoPi(), 4); //create function for flowharmonics
-  kDist = new TF1(Form("dist_%d", pdg), flowDistribution, 0, 1, 4);
+  kFlow = new TF1(Form("flow_%d",pdg), flowHarmonics, -TMath::Pi(), TMath::Pi(), 4); //create function for flowharmonics
+  kDist = new TF1(Form("dist_%d", pdg), flowDistribution, -TMath::Pi(), TMath::Pi(), 4);
   kFlow->SetParameters(0.0,0.0,0.0,0.0);
   kDist->SetParameters(0.0,0.0,0.0,0.0);
   kVm = new double[4];
@@ -135,7 +135,7 @@ double FemtoFlowDataBase::getPhi(double pT){
   this->getVms(pT);
 
   kFlow->SetParameters(this->kVm[0],this->kVm[1],this->kVm[2],this->kVm[3]);
-  phi = kDist->Eval(gRandom->Rndm());
+  phi = kDist->GetX(gRandom->Rndm() * TMath::TwoPi() - TMath::Pi());
   hStats->Fill(pT,phi);
   return phi;
 }
