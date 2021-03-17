@@ -147,7 +147,7 @@ void drawPDG(TSQLServer* server, TString tName, TString v_param, TString central
 *   INPUT:
 *      server - pointer to MySQL server
 *      tName  - name of the table which should be written out
-*   RETURNS:
+*   RETURN:
 *      number of entries in the table that have been written out.
 *      if there was a problem with table, function returns -1
 */
@@ -186,7 +186,7 @@ int getData(TSQLServer* server, TString tName){
 *   INPUT:
 *     server - pointer to MySQL server
 *     tName  - name for the table you want to create
-*   OUTPUT:
+*   RETURN:
 *     int - 1 if the table has been created successfully and -1 if there was
 *           a problem. 0 if a table with that name already exists
 */
@@ -244,7 +244,7 @@ int createTable(TSQLServer* server, const char* tName ){
 *                    in format for example "0-5%"
 *       pT         - value of pT in GeV
 *       v          - value of v parameter
-*    OUTPUT:
+*    RETURN:
 *       1 if data was succesfully inserted and -1 if something failed
 */
 int insertData(TSQLServer* server,
@@ -301,8 +301,23 @@ int insertData(TSQLServer* server,
 }
 
 /*
-* function for filling MySQL table with data from CSV file
-*
+* function for filling MySQL table with data from CSV file. CSV file is a tmp
+* file that is created by removing first info lines from HEPdata file
+* tmp format: pT, pT low, pT high, v2, stat +, stat-, sys +, sys -
+*    INPUT:
+*      fileName   - name of the CSV file (tmp format)
+*      server     - pointer to the MySQL server (from connectSQL() function)
+*      tName      - name of a table to which data should be added
+*      v_param    - name of the parameter (for example "v2")
+*      energy     - energy of the collision (in GeV)
+*      centrality - centrality of the collision (format "low-high%")
+*      eta        - pseudorapidity
+*      reference  - reference to the table from HEPdata or directly to the publication
+*      experiment - name of the experiment that did the measurements
+*   RETURN:
+*      number of entries added to the table.
+*         If there was an error it will return -1
+*         If this data already is in the table function returns 0
 */
 
 int readCSV(const char* fileName, TSQLServer* server, TString tName, TString v_param, double energy, TString centrality, TString eta, TString reference, TString experiment){
@@ -357,6 +372,12 @@ int readCSV(const char* fileName, TSQLServer* server, TString tName, TString v_p
   return entries;
 }
 
+/*
+* function for filling MySQL table with data from CSV file. The data format is 
+* different but function works as the function above. The data in CSV file was
+* not saved as a histogram in HEPdata.
+*   tmp file format: pT, v2, stat +, stat-, sys +, sys -
+*/
 int readCSVnotHist(const char* fileName, TSQLServer* server, TString tName, TString v_param, double energy, TString centrality, TString eta, TString reference, TString experiment){
   int entries = 0;
 
@@ -411,23 +432,11 @@ int readCSVnotHist(const char* fileName, TSQLServer* server, TString tName, TStr
 }
 
 
+/********** alteranative function for specified particle with pdg ************/
+/********* same functions as above with additional argument for pdg **********/
 /*
 * function to insert data into MySQL table names tTable
-*    INPUT:
-*       server     - MySQL server at which table is lovated
-*       tName      - name of the table
-*       v_param    - name of the parameter
-*       energy     - value for energy ( sqrt(s_NN) ) in GeV
-*       centrality - centrality of the collision
-*                    in format for example "0-5%"
-*       pT         - value of pT in GeV
-*       v          - value of v parameter
-*    OUTPUT:
-*       1 if data was succesfully inserted and -1 if something failed
 */
-
-/* alteranative function for specified particle with pdg    */
-/* same functions as above with additional argument for pdg */
 int insertData(TSQLServer* server,
                TString tName,
                TString v_param,
@@ -485,7 +494,7 @@ int insertData(TSQLServer* server,
 
 /*
 * function for filling MySQL table with data from CSV file
-*
+*   tmp file format: pT, pT low, pT high, v2, stat +, stat-, sys +, sys -
 */
 
 int readCSV(const char* fileName, TSQLServer* server, TString tName, TString v_param, int pdg, double energy, TString centrality, TString eta, TString reference, TString experiment){
@@ -540,6 +549,11 @@ int readCSV(const char* fileName, TSQLServer* server, TString tName, TString v_p
   return entries;
 }
 
+/*
+* function to fill data that was not saved as a histogram in the HEPdata
+*   tmp file format: pT, v2, stat +, stat-, sys +, sys -
+*/
+
 int readCSVnotHist(const char* fileName, TSQLServer* server, TString tName, TString v_param, int pdg, double energy, TString centrality, TString eta, TString reference, TString experiment){
   int entries = 0;
 
@@ -567,7 +581,7 @@ int readCSVnotHist(const char* fileName, TSQLServer* server, TString tName, TStr
     std::getline(file,line);
     while(std::getline(file,line)){
       std::stringstream ss(line); //line with titles of columns
-      //csv file is saved as: pT, pT low, pT high, v2, stat +, stat-, sys +, sys -
+      //csv file is saved as: pT, v2, stat +, stat-, sys +, sys -
       int colID = 0;
       while(ss>>value){
         if(colID == 0){
