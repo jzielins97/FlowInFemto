@@ -153,24 +153,22 @@ void drawPDG(TSQLServer* server, TString tName, TString v_param, TString central
 */
 int getData(TSQLServer* server, TString tName){
 
-  TSQLStatement* stmt = server->Statement(Form("SELECT * FROM %s",tName.Data()),100);
+  TSQLStatement* stmt = server->Statement(Form("SELECT energy, centrality, pdg,  pT, v2, v3 FROM %s",tName.Data()),100);
 
   int entries = 0;
-  printf("E (GeV) | centrality | pT (GeV) | v2 | v3 \n");
+  printf("E (GeV) | centrality |  pdg  |pT (GeV) | v2 | v3 \n");
   if(stmt->Process()){
     stmt->StoreResult();
     while(stmt->NextResultRow()){
-      Double_t energy = stmt->GetDouble(1);
-      TString centrality = stmt->GetString(2);
+      Double_t energy = stmt->GetDouble(0);
+      TString centrality = stmt->GetString(1);
+      Int_t pdg = stmt->GetInt(2);
       Double_t pT = stmt->GetDouble(3);
-      Double_t u_pT = stmt->GetDouble(4);
-      Double_t v2 = stmt->GetDouble(5);
-      Double_t u_v2 = stmt->GetDouble(6);
-      Double_t v3 = stmt->GetDouble(7);
-      Double_t u_v3 = stmt->GetDouble(8);
+      Double_t v2 = stmt->GetDouble(4);
+      Double_t v3 = stmt->GetDouble(5);
       entries++;
 
-      printf("%5f GeV | %10s | %.3f GeV | %.6f | %.6f\n",energy,centrality.Data(),pT, v2, v3);
+      printf("%5f | %10s | %5d | %.3f GeV | %.6f | %.6f\n",energy,centrality.Data(), pdg,pT, v2, v3);
     }
   }else{
     std::cout<<"ERROR: there was a problem receiving data from the database"<<std::endl;
@@ -330,7 +328,7 @@ int readCSV(const char* fileName, TSQLServer* server, TString tName, TString v_p
     return -1;
   }
 
-  TSQLStatement* stmt = server->Statement(Form("SELECT COUNT(%s) FROM %s WHERE reference == %s AND pdg == NULL AND %s IS NOT NULL;", v_param.Data(), tName.Data(), reference.Data(), v_param.Data()),100);
+  TSQLStatement* stmt = server->Statement(Form("SELECT COUNT(%s) FROM %s WHERE reference = \"%s\" AND pdg = NULL AND %s IS NOT NULL;", v_param.Data(), tName.Data(), reference.Data(), v_param.Data()),100);
   stmt->StoreResult();
   if(stmt->Process()){
     stmt->NextResultRow();
@@ -373,7 +371,7 @@ int readCSV(const char* fileName, TSQLServer* server, TString tName, TString v_p
 }
 
 /*
-* function for filling MySQL table with data from CSV file. The data format is 
+* function for filling MySQL table with data from CSV file. The data format is
 * different but function works as the function above. The data in CSV file was
 * not saved as a histogram in HEPdata.
 *   tmp file format: pT, v2, stat +, stat-, sys +, sys -
@@ -388,7 +386,7 @@ int readCSVnotHist(const char* fileName, TSQLServer* server, TString tName, TStr
     return -1;
   }
 
-  TSQLStatement* stmt = server->Statement(Form("SELECT COUNT(%s) FROM %s WHERE reference == %s AND pdg == NULL AND %s IS NOT NULL;", v_param.Data(), tName.Data(), reference.Data(), v_param.Data()),100);
+  TSQLStatement* stmt = server->Statement(Form("SELECT COUNT(%s) FROM %s WHERE reference = \"%s\" AND pdg = NULL AND %s IS NOT NULL;", v_param.Data(), tName.Data(), reference.Data(), v_param.Data()),100);
   stmt->StoreResult();
   if(stmt->Process()){
     stmt->NextResultRow();
@@ -507,7 +505,7 @@ int readCSV(const char* fileName, TSQLServer* server, TString tName, TString v_p
     return -1;
   }
 
-  TSQLStatement* stmt = server->Statement(Form("SELECT COUNT(%s) FROM %s WHERE reference == %s AND pdg == %d AND %s IS NOT NULL;", v_param.Data(), tName.Data(), reference.Data(), pdg, v_param.Data()),100);
+  TSQLStatement* stmt = server->Statement(Form("SELECT COUNT(%s) FROM %s WHERE reference = \"%s\" AND pdg = %d AND %s IS NOT NULL;", v_param.Data(), tName.Data(), reference.Data(), pdg, v_param.Data()),100);
   stmt->StoreResult();
   if(stmt->Process()){
     stmt->NextResultRow();
@@ -564,7 +562,7 @@ int readCSVnotHist(const char* fileName, TSQLServer* server, TString tName, TStr
     return -1;
   }
 
-  TSQLStatement* stmt = server->Statement(Form("SELECT COUNT(%s) FROM %s WHERE reference == %s AND pdg == %d AND %s IS NOT NULL;", v_param.Data(), tName.Data(), reference.Data(), pdg, v_param.Data()),100);
+  TSQLStatement* stmt = server->Statement(Form("SELECT COUNT(%s) FROM %s WHERE reference = \"%s\" AND pdg = %d AND %s IS NOT NULL;", v_param.Data(), tName.Data(), reference.Data(), pdg, v_param.Data()),100);
   stmt->StoreResult();
   if(stmt->Process()){
     stmt->NextResultRow();
