@@ -11,6 +11,10 @@
 ################
 *~
 
+# root output files #
+#####################
+*.root
+
 # Final executable #
 ####################
 CfBackgroundFlow

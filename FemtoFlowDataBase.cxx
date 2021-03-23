@@ -28,7 +28,7 @@ double flowDistribution(double *x, double *par)
 */
 FemtoFlowDataBase::FemtoFlowDataBase( int pdg, const char* tableName, double energy, const char* centrality,const char* experiment)
 {
-  kServer = TSQLServer::Connect("mysql://localhost/flow","vm","P4$$w0rd"); //connect to the database
+  kServer = TSQLServer::Connect("mysql://localhost/flow","vm","Pass1234"); //connect to the database
   // kFlow = new TF1(Form("flow_%d",pdg), flowHarmonics, 0, TMath::TwoPi(), 4); //create function for flowharmonics
   kFlow = new TF1(Form("flow_%d",pdg), flowHarmonics, -TMath::Pi(), TMath::Pi(), 4); //create function for flowharmonics
   kDist = new TF1(Form("dist_%d", pdg), flowDistribution, -TMath::Pi(), TMath::Pi(), 4);
