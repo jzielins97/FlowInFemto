@@ -1,0 +1,16 @@
+# Compiled source #
+###################
+*.o
+*.so
+
+# Logs of the database #
+########################
+*.sql
+
+# Emacs copies #
+################
+*~
+
+# Final executable #
+####################
+CfBackgroundFlow
