@@ -2468,10 +2468,10 @@ void CorrFctnDirectYlm::AddToList(TList *fOutput)
   for (int ilm=0; ilm<maxjm; ilm++) {
     fOutput->Add(numsreal[ilm]);
     fOutput->Add(densreal[ilm]);
-    //    fOutput->Add(cfctreal[ilm]);
+    fOutput->Add(cfctreal[ilm]);
     fOutput->Add(numsimag[ilm]);
     fOutput->Add(densimag[ilm]);
-    //    fOutput->Add(cfctimag[ilm]);
+    fOutput->Add(cfctimag[ilm]);
   }
   
   if (covnum) { 

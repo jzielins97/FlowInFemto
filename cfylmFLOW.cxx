@@ -12,13 +12,13 @@
 #include "TStopwatch.h"
 
 int main(int argc, char** argv){
-  int pdg1, pdg2;
+  int pdg1, pdg2, charge1, charge2;
   TFile* fin1;
   TFile* fin2;
   TList* fOutput = new TList();
 
-  TH1D* h_pt1=0;
-  TH1D* h_pt2=0;
+  TH1F* h_pt1=0;
+  TH1F* h_pt2=0;
 
   CorrFctnDirectYlm* fCylm;
   FemtoFlowDataBase* dFlowPart1;
@@ -36,7 +36,9 @@ int main(int argc, char** argv){
 //setting up first particle
   //database:
   pdg1 = atoi(argv[1]);
-  dFlowPart1 = new FemtoFlowDataBase(pdg1);
+  if(pdg1 > 0) charge1 = 1;
+  else charge1 = -1;
+  dFlowPart1 = new FemtoFlowDataBase(TMath::Abs(pdg1));
   int foundVnForPart1 = dFlowPart1->downloadGraphs();
   std::cout<<"\tFor particle "<<pdg1<<" found "<<foundVnForPart1<<" v params"<<std::endl;
   //geting pT distribution histogram
@@ -47,7 +49,9 @@ int main(int argc, char** argv){
 //setting up second particle
   //database:
   pdg2 = atoi(argv[3]);
-  dFlowPart2 = new FemtoFlowDataBase(pdg2);
+  if(pdg2 > 0) charge2 = 1;
+  else charge2 = -1;
+  dFlowPart2 = new FemtoFlowDataBase(TMath::Abs(pdg2));
   int foundVnForPart2 = dFlowPart2->downloadGraphs();
   std::cout<<"\tFor particle "<<pdg2<<" found "<<foundVnForPart2<<" v params"<<std::endl;
 
@@ -77,6 +81,10 @@ int main(int argc, char** argv){
 
       Double_t phi1 = dFlowPart1->getPhi(pt1);
       Double_t phi2 = dFlowPart2->getPhi(pt2);
+
+      //Double_t phi1 = gRandom->Rndm()*TMath::TwoPi() - TMath::Pi();
+      //Double_t phi2 = gRandom->Rndm()*TMath::TwoPi() - TMath::Pi();
+
 
       Double_t eta1 = 2. * (gRandom->Rndm() - 0.5) * 0.8;
       Double_t eta2 = 2. * (gRandom->Rndm() - 0.5) * 0.8;
@@ -117,8 +125,8 @@ int main(int argc, char** argv){
       fCylm->AddRealPair(mko,mks,mkl,1.0);
 
 /***** creating den histogram **************/
-      phi1 = gRandom->Rndm()*TMath::TwoPi();
-      phi2 = gRandom->Rndm()*TMath::TwoPi();
+      phi1 = gRandom->Rndm()*TMath::TwoPi() - TMath::Pi();
+      phi2 = gRandom->Rndm()*TMath::TwoPi() - TMath::Pi();
 
 
       v1.SetCoordinates(pt1, eta1, phi1, massPi);
@@ -166,9 +174,26 @@ int main(int argc, char** argv){
   fout->cd();
   fOutput->Write("fOutput",1);
   // fout->ls();
-
   fout->Close();
+
+  //  std::cout<<"Saving cf (spherical harmonics)"<<std::endl;
+  //  fout = new TFile("cf_hists.root","RECREATE");
+  //  fout->cd();
+  //  for(int il=0;il<4;il++){
+  //    for(int im=0;im<=il;im++){
+  //      fCylm->GetCfnRealHist(il,im)->Write(Form("CfReYlm%d%dCylm",il,im));
+  //      fCylm->GetCfnImagHist(il,im)->Write(Form("CfImYlm%d%dCylm",il,im));
+  //    }
+  //  }      
+  //  fout->Close();
+  
   fOutput->Clear();
+
+  std::cout<<"Saving database statistics"<<std::endl;
+  fout = new TFile("database_stats.root","RECREATE");
+  dFlowPart1->getStatsHisto()->Write("hStats_pi");
+  dFlowPart2->getStatsHisto()->Write("hStats_K");
+  fout->Close();
 
   //fCylm->Wrie();
 

@@ -48,7 +48,7 @@ FemtoFlowDataBase::FemtoFlowDataBase( int pdg, const char* tableName, double ene
   gVm[1] = new TGraphErrors();
   gVm[1]->SetTitle(Form("v_{3} for %d;p_{T} (GeV);v_{3}", pdg));
 
-  hStats = new TH2D(Form("hStats_%d",pdg), Form("#phi(pT) vs pT histogram (%d);pT (GeV); #phi(pT);entries",pdg),100,0,10,100,0.0,TMath::TwoPi());
+  hStats = new TH2D(Form("hStats_%d",pdg), Form("#phi(pT) vs pT histogram (%d);pT (GeV); #phi(pT);entries",pdg),100,0,3,100,-TMath::Pi(),TMath::Pi());
 }
 
 /*
@@ -134,7 +134,7 @@ double FemtoFlowDataBase::getPhi(double pT){
   double phi = 0.0;
   this->getVms(pT);
 
-  kFlow->SetParameters(this->kVm[0],this->kVm[1],this->kVm[2],this->kVm[3]);
+  kDist->SetParameters(this->kVm[0],this->kVm[1],this->kVm[2],this->kVm[3]);
   phi = kDist->GetX(gRandom->Rndm() * TMath::TwoPi() - TMath::Pi());
   hStats->Fill(pT,phi);
   return phi;
