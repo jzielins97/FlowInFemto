@@ -27,11 +27,14 @@ int main(int argc, char** argv){
   Double_t massPi = 0.139570;
   Double_t massK = 0.493677;
 
+  const char* centrality = "0-5%";
+
   if(argc < 6){
     std::cout<<"Error: not enough arguments. Needs: 4, was given: "<<argc-1<<"."<<std::endl;
     std::cout<<"<particle #1 pdg> <pT distribution file #1> <particle #2 pdg> <pT distribution #2> <N>"<<std::endl;
     return -1;
   }
+  if(argc > 6) centrality = argv[6];
 
 //setting up first particle
   //database:
@@ -39,12 +42,15 @@ int main(int argc, char** argv){
   if(pdg1 > 0) charge1 = 1;
   else charge1 = -1;
   dFlowPart1 = new FemtoFlowDataBase(TMath::Abs(pdg1));
+  dFlowPart1->setCentrality(centrality);
+  dFlowPart1->showParams();
   int foundVnForPart1 = dFlowPart1->downloadGraphs();
   std::cout<<"\tFor particle "<<pdg1<<" found "<<foundVnForPart1<<" v params"<<std::endl;
   //geting pT distribution histogram
   fin1 = new TFile(argv[2]);
   fin1->GetObject("hpt1",h_pt1);
   std::cout<<"\tThere are "<<h_pt1->GetEntries()<<" entries in the histogram"<<std::endl;
+  
 
 //setting up second particle
   //database:
@@ -52,15 +58,17 @@ int main(int argc, char** argv){
   if(pdg2 > 0) charge2 = 1;
   else charge2 = -1;
   dFlowPart2 = new FemtoFlowDataBase(TMath::Abs(pdg2));
+  dFlowPart2->setCentrality(centrality);
+  dFlowPart2->showParams();
   int foundVnForPart2 = dFlowPart2->downloadGraphs();
   std::cout<<"\tFor particle "<<pdg2<<" found "<<foundVnForPart2<<" v params"<<std::endl;
 
   fin2 = new TFile(argv[4]);
   fin2->GetObject("hpt2",h_pt2);
   std::cout<<"\tThere are "<<h_pt2->GetEntries()<<" entries in the histogram"<<std::endl;
-
+  
   int N = atoi(argv[5]);
-  std::cout<<"\tN="<<N<<std::endl;
+  std::cout<<"N="<<N<<std::endl;
 
   fCylm = new CorrFctnDirectYlm("Cylm",3,100,0.0,0.5);
 
@@ -76,8 +84,11 @@ int main(int argc, char** argv){
   std::cout << "Loop for filling the random" << std::endl;
   for (int i = 0; i < N; i++)
   {
-      Double_t pt1 = h_pt1->GetRandom();
-      Double_t pt2 = h_pt2->GetRandom();
+    
+    Double_t pt1 = h_pt1->GetRandom();
+    Double_t pt2 = h_pt2->GetRandom();
+    while(pt1 < 0.19 || pt1 > 1.5) pt1 = h_pt1->GetRandom();
+    while(pt2 < 0.19 || pt2 > 1.5) pt2 = h_pt2->GetRandom();
 
       Double_t phi1 = dFlowPart1->getPhi(pt1);
       Double_t phi2 = dFlowPart2->getPhi(pt2);
@@ -137,6 +148,7 @@ int main(int argc, char** argv){
 
       vsumb = v1b + v2b;
 
+      //boost = vsumb.BoostVector();
       boost.SetXYZ(0.0,0.0,(v1b.Pz()+v2b.Pz())/(v1b.E()+v2b.E()));
       v1b.Boost(-boost);
       v2b.Boost(-boost);

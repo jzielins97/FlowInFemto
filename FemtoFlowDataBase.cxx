@@ -153,7 +153,7 @@ from the databse.
 *******************************************/
 void FemtoFlowDataBase::getVms(double pT){
 
-  kVm[0] = 0.05; // v2
+  kVm[0] = 0.0; // v2
   kVm[1] = 0.0;  // v3
   kVm[2] = 0.0;  // v4 is not in the database (yet)
   kVm[3] = 0.0;  // v5 is not in the database (yet)
