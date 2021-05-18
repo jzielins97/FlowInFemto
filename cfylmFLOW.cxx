@@ -90,86 +90,130 @@ int main(int argc, char** argv){
     while(pt1 < 0.19 || pt1 > 1.5) pt1 = h_pt1->GetRandom();
     while(pt2 < 0.19 || pt2 > 1.5) pt2 = h_pt2->GetRandom();
 
-      Double_t phi1 = dFlowPart1->getPhi(pt1);
-      Double_t phi2 = dFlowPart2->getPhi(pt2);
+    Double_t phi1 = dFlowPart1->getPhi(pt1);
+    Double_t phi2 = dFlowPart2->getPhi(pt2);
 
-      //Double_t phi1 = gRandom->Rndm()*TMath::TwoPi() - TMath::Pi();
-      //Double_t phi2 = gRandom->Rndm()*TMath::TwoPi() - TMath::Pi();
+    Double_t eta1 = 2. * (gRandom->Rndm() - 0.5) * 0.8;
+    Double_t eta2 = 2. * (gRandom->Rndm() - 0.5) * 0.8;
 
+    v1.SetCoordinates(pt1, eta1, phi1, massPi);
+    v2.SetCoordinates(pt2, eta2, phi2, massK);
 
-      Double_t eta1 = 2. * (gRandom->Rndm() - 0.5) * 0.8;
-      Double_t eta2 = 2. * (gRandom->Rndm() - 0.5) * 0.8;
+    v1b.SetPxPyPzE(v1.Px(), v1.Py(), v1.Pz(), sqrt(massPi * massPi + v1.Px() * v1.Px() + v1.Py() * v1.Py() + v1.Pz() * v1.Pz()));
+    v2b.SetPxPyPzE(v2.Px(), v2.Py(), v2.Pz(), sqrt(massK * massK + v2.Px() * v2.Px() + v2.Py() * v2.Py() + v2.Pz() * v2.Pz()));
 
-      v1.SetCoordinates(pt1, eta1, phi1, massPi);
-      v2.SetCoordinates(pt2, eta2, phi2, massK);
+    // vsumb = v1b + v2b;
 
-      v1b.SetPxPyPzE(v1.Px(), v1.Py(), v1.Pz(), sqrt(massPi * massPi + v1.Px() * v1.Px() + v1.Py() * v1.Py() + v1.Pz() * v1.Pz()));
-      v2b.SetPxPyPzE(v2.Px(), v2.Py(), v2.Pz(), sqrt(massK * massK + v2.Px() * v2.Px() + v2.Py() * v2.Py() + v2.Pz() * v2.Pz()));
+    // TVector3 boost;// = vsumb.BoostVector();
+    // boost.SetXYZ(0.0,0.0,(v1b.Pz()+v2b.Pz())/(v1b.E()+v2b.E()));
+    // v1b.Boost(-boost);
+    // v2b.Boost(-boost);
 
-      vsumb = v1b + v2b;
+    // std::cout<<"v1.Px="<<v1.Px()<<" v1.Py="<<v1.Py()<<" v2.Px="<<v2.Px()<<" v2.Py="<<v2.Py()<<std::endl;
+    // std::cout<<boost.X()<<". "<<boost.Y()<<std::endl;
+    // std::cout<<"v1b.Px="<<v1b.Px()<<" v1b.Py="<<v1b.Py()<<" v1b.Px="<<v2b.Px()<<" v2b.Py="<<v2b.Py()<<std::endl;
+    // std::cout<<"\tv1b.Px+v2b.Px="<<v1b.Px()+v2b.Px()<<" v1b.Py+v2b.Py="<<v1b.Py()+v2b.Py()<<std::endl;
 
-      TVector3 boost;// = vsumb.BoostVector();
-      boost.SetXYZ(0.0,0.0,(v1b.Pz()+v2b.Pz())/(v1b.E()+v2b.E()));
-      v1b.Boost(-boost);
-      v2b.Boost(-boost);
+    // if(isnan(v1b.Px()) || isnan(v2b.Px())){
+    //   std::cout<<"\tThere is a nan"<<std::endl;
+    // }
+    // Float_t kt = 0.5 * TMath::Hypot(v1b.Px() + v2b.Px(), v1b.Py() + v2b.Py());
 
-      // std::cout<<"v1.Px="<<v1.Px()<<" v1.Py="<<v1.Py()<<" v2.Px="<<v2.Px()<<" v2.Py="<<v2.Py()<<std::endl;
-      // std::cout<<boost.X()<<". "<<boost.Y()<<std::endl;
-      // std::cout<<"v1b.Px="<<v1b.Px()<<" v1b.Py="<<v1b.Py()<<" v1b.Px="<<v2b.Px()<<" v2b.Py="<<v2b.Py()<<std::endl;
-      // std::cout<<"\tv1b.Px+v2b.Px="<<v1b.Px()+v2b.Px()<<" v1b.Py+v2b.Py="<<v1b.Py()+v2b.Py()<<std::endl;
+    // Float_t pXsum = v1b.Px() + v2b.Px();
+    // Float_t pYsum = v2b.Py() + v2b.Py();
+    // Float_t pXdif = v1b.Px() - v2b.Px();
+    // Float_t pYdif = v1b.Py() - v2b.Py();
 
-      if(isnan(v1b.Px()) || isnan(v2b.Px())){
-        std::cout<<"\tThere is a nan"<<std::endl;
-      }
-      Float_t kt = 0.5 * TMath::Hypot(v1b.Px() + v2b.Px(), v1b.Py() + v2b.Py());
+    // Float_t mko = 0.5 * (pXsum * pXdif + pYsum * pYdif) / kt;
+    // Float_t mks = (v1b.Px() * v2b.Py() - v1b.Py() * v2b.Px()) / kt;
+    // Float_t mkl = v1b.Pz() - v2b.Pz();
 
-      Float_t pXsum = v1b.Px() + v2b.Px();
-      Float_t pYsum = v2b.Py() + v2b.Py();
-      Float_t pXdif = v1b.Px() - v2b.Px();
-      Float_t pYdif = v1b.Py() - v2b.Py();
+    //std::cout<<mko<<","<<mks<<","<<mkl<<"("<<TMath::Sqrt(mko*mko + mks*mks + mkl*mkl)<<")"<<std::endl;
 
-      Float_t mko = 0.5 * (pXsum * pXdif + pYsum * pYdif) / kt;
-      Float_t mks = (v1b.Px() * v2b.Py() - v1b.Py() * v2b.Px()) / kt;
-      Float_t mkl = v1b.Pz() - v2b.Pz();
+    // sum the 4-vector components of both particles
+    //total px, py, pz and E
+    Double_t tpx = v1b.Px() + v2b.Px();
+    Double_t tpy = v1b.Py() + v2b.Py();
+    Double_t tpz = v1b.Pz() + v2b.Pz();
+    Double_t te  = v1b.E()  + v2b.E();
+    //total pt and mt
+    Double_t tpt = tpx * tpx + tpy * tpy;
+    Double_t tmt = te * te - tpz * tpz;
+    Double_t tm  = sqrt(tmt - tpt);
+    tmt = sqrt(tmt);
+    tpt = sqrt(tpt);
+    // bt
+    Double_t tbt = tpt / tmt;
+    //calculation of ko, ks, kl
+    Double_t tbm = tpz / te;
+    Double_t tgm = te / tmt;
+    Double_t mkl = tgm * (v1b.Pz() - tbm * v1b.E());
+    Double_t met = tgm * (v1b.E() - tbm * v1b.Pz());
 
-      //std::cout<<mko<<","<<mks<<","<<mkl<<"("<<TMath::Sqrt(mko*mko + mks*mks + mkl*mkl)<<")"<<std::endl;
-      fCylm->AddRealPair(mko,mks,mkl,1.0);
+    Double_t mko = (v1b.Px() * tpx + v1b.Py() * tpy) / tpt;
+    Double_t mks = (-v1b.Px() * tpy + v1b.Py() * tpx) / tpt;
+    // Double_t mkol = mko;
+    mko = (tmt / tm) * (mko - (tpt / tmt) * met);
+      
+    fCylm->AddRealPair(mko,mks,mkl,1.0);
 
-/***** creating den histogram **************/
-      phi1 = gRandom->Rndm()*TMath::TwoPi() - TMath::Pi();
-      phi2 = gRandom->Rndm()*TMath::TwoPi() - TMath::Pi();
+    /***** creating den histogram **************/
+    phi1 = gRandom->Rndm()*TMath::TwoPi() - TMath::Pi();
+    phi2 = gRandom->Rndm()*TMath::TwoPi() - TMath::Pi();
 
+    v1.SetCoordinates(pt1, eta1, phi1, massPi);
+    v2.SetCoordinates(pt2, eta2, phi2, massK);
 
-      v1.SetCoordinates(pt1, eta1, phi1, massPi);
-      v2.SetCoordinates(pt2, eta2, phi2, massK);
+    v1b.SetPxPyPzE(v1.Px(), v1.Py(), v1.Pz(), sqrt(massPi * massPi + v1.Px() * v1.Px() + v1.Py() * v1.Py() + v1.Pz() * v1.Pz()));
+    v2b.SetPxPyPzE(v2.Px(), v2.Py(), v2.Pz(), sqrt(massK * massK + v2.Px() * v2.Px() + v2.Py() * v2.Py() + v2.Pz() * v2.Pz()));
 
-      v1b.SetPxPyPzE(v1.Px(), v1.Py(), v1.Pz(), sqrt(massPi * massPi + v1.Px() * v1.Px() + v1.Py() * v1.Py() + v1.Pz() * v1.Pz()));
-      v2b.SetPxPyPzE(v2.Px(), v2.Py(), v2.Pz(), sqrt(massK * massK + v2.Px() * v2.Px() + v2.Py() * v2.Py() + v2.Pz() * v2.Pz()));
+    // vsumb = v1b + v2b;
 
-      vsumb = v1b + v2b;
+    // boost = vsumb.BoostVector();
+    // boost.SetXYZ(0.0,0.0,(v1b.Pz()+v2b.Pz())/(v1b.E()+v2b.E()));
+    // v1b.Boost(-boost);
+    // v2b.Boost(-boost);
+    // kt = 0.5 * TMath::Hypot(v1b.X() + v2b.X(), v1b.Y() + v2b.Y());
 
-      //boost = vsumb.BoostVector();
-      boost.SetXYZ(0.0,0.0,(v1b.Pz()+v2b.Pz())/(v1b.E()+v2b.E()));
-      v1b.Boost(-boost);
-      v2b.Boost(-boost);
-      kt = 0.5 * TMath::Hypot(v1b.X() + v2b.X(), v1b.Y() + v2b.Y());
+    // pXsum = v1b.X() + v2b.X();
+    // pYsum = v2b.Y() + v2b.Y();
+    // pXdif = v1b.X() - v2b.X();
+    // pYdif = v1b.Y() - v2b.Y();
 
-      pXsum = v1b.X() + v2b.X();
-      pYsum = v2b.Y() + v2b.Y();
-      pXdif = v1b.X() - v2b.X();
-      pYdif = v1b.Y() - v2b.Y();
+    // mko = 0.5 * (pXsum * pXdif + pYsum * pYdif) / kt;
+    // mks = (v1b.X() * v2b.Y() - v1b.Y() * v2b.X()) / kt;
+    // mkl = v1b.Z() - v2b.Z();
 
-      mko = 0.5 * (pXsum * pXdif + pYsum * pYdif) / kt;
-      mks = (v1b.X() * v2b.Y() - v1b.Y() * v2b.X()) / kt;
-      mkl = v1b.Z() - v2b.Z();
+    tpx = v1b.Px() + v2b.Px();
+    tpy = v1b.Py() + v2b.Py();
+    tpz = v1b.Pz() + v2b.Pz();
+    te  = v1b.E()  + v2b.E();
+    //total pt and mt
+    tpt = tpx * tpx + tpy * tpy;
+    tmt = te * te - tpz * tpz;
+    tm  = sqrt(tmt - tpt);
+    tmt = sqrt(tmt);
+    tpt = sqrt(tpt);
+    // bt
+    tbt = tpt / tmt;
+    //calculation of ko, ks, kl
+    tbm = tpz / te;
+    tgm = te / tmt;
+    mkl = tgm * (v1b.Pz() - tbm * v1b.E());
+    met = tgm * (v1b.E() - tbm * v1b.Pz());
 
-      fCylm->AddMixedPair(mko,mks,mkl,1.0);
+    mko = (v1b.Px() * tpx + v1b.Py() * tpy) / tpt;
+    mks = (-v1b.Px() * tpy + v1b.Py() * tpx) / tpt;
+    // mkol = mko;
+    mko = (tmt / tm) * (mko - (tpt / tmt) * met);
+      
+    fCylm->AddMixedPair(mko,mks,mkl,1.0);
 
-      if((i+1)%1000 == 0){
-        printf("\r%6d/%d",i+1,N);
-        fflush(stdout);
-      }
-      //printProgress(i+1,N);
+    if((i+1)%1000 == 0){
+      printf("\r%6d/%d",i+1,N);
+      fflush(stdout);
+    }
+    //printProgress(i+1,N);
   }
   timer->Stop();
   std::cout<<std::endl;
