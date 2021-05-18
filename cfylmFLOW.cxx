@@ -12,7 +12,7 @@
 #include "TStopwatch.h"
 
 int main(int argc, char** argv){
-  int pdg1, pdg2, charge1, charge2;
+  int pdg1, pdg2;
   TFile* fin1;
   TFile* fin2;
   TList* fOutput = new TList();
@@ -39,12 +39,13 @@ int main(int argc, char** argv){
 //setting up first particle
   //database:
   pdg1 = atoi(argv[1]);
-  if(pdg1 > 0) charge1 = 1;
-  else charge1 = -1;
   dFlowPart1 = new FemtoFlowDataBase(TMath::Abs(pdg1));
-  dFlowPart1->setCentrality(centrality);
-  dFlowPart1->showParams();
-  int foundVnForPart1 = dFlowPart1->downloadGraphs();
+  dFlowPart1->SetExperimentName("ALICE");
+  dFlowPart1->SetEnergy(2760);
+  dFlowPart1->SetTableName("PbPb");
+  dFlowPart1->SetCentrality(centrality);
+  dFlowPart1->ShowParams();
+  int foundVnForPart1 = dFlowPart1->DownloadGraphs();
   std::cout<<"\tFor particle "<<pdg1<<" found "<<foundVnForPart1<<" v params"<<std::endl;
   //geting pT distribution histogram
   fin1 = new TFile(argv[2]);
@@ -55,12 +56,10 @@ int main(int argc, char** argv){
 //setting up second particle
   //database:
   pdg2 = atoi(argv[3]);
-  if(pdg2 > 0) charge2 = 1;
-  else charge2 = -1;
   dFlowPart2 = new FemtoFlowDataBase(TMath::Abs(pdg2));
-  dFlowPart2->setCentrality(centrality);
-  dFlowPart2->showParams();
-  int foundVnForPart2 = dFlowPart2->downloadGraphs();
+  dFlowPart2->SetCentrality(centrality);
+  dFlowPart2->ShowParams();
+  int foundVnForPart2 = dFlowPart2->DownloadGraphs();
   std::cout<<"\tFor particle "<<pdg2<<" found "<<foundVnForPart2<<" v params"<<std::endl;
 
   fin2 = new TFile(argv[4]);
@@ -70,7 +69,7 @@ int main(int argc, char** argv){
   int N = atoi(argv[5]);
   std::cout<<"N="<<N<<std::endl;
 
-  fCylm = new CorrFctnDirectYlm("Cylm",3,100,0.0,0.5);
+  fCylm = new CorrFctnDirectYlm("Cylm",1,100,0.0,0.5);
 
   ROOT::Math::PtEtaPhiE4D<double> v1(1, 1, 1, 1);
   ROOT::Math::PtEtaPhiE4D<double> v2(1, 1, 1, 1);
@@ -90,8 +89,8 @@ int main(int argc, char** argv){
     while(pt1 < 0.19 || pt1 > 1.5) pt1 = h_pt1->GetRandom();
     while(pt2 < 0.19 || pt2 > 1.5) pt2 = h_pt2->GetRandom();
 
-    Double_t phi1 = dFlowPart1->getPhi(pt1);
-    Double_t phi2 = dFlowPart2->getPhi(pt2);
+    Double_t phi1 = dFlowPart1->GetPhi(pt1);
+    Double_t phi2 = dFlowPart2->GetPhi(pt2);
 
     Double_t eta1 = 2. * (gRandom->Rndm() - 0.5) * 0.8;
     Double_t eta2 = 2. * (gRandom->Rndm() - 0.5) * 0.8;
@@ -206,7 +205,7 @@ int main(int argc, char** argv){
     mks = (-v1b.Px() * tpy + v1b.Py() * tpx) / tpt;
     // mkol = mko;
     mko = (tmt / tm) * (mko - (tpt / tmt) * met);
-      
+          
     fCylm->AddMixedPair(mko,mks,mkl,1.0);
 
     if((i+1)%1000 == 0){
@@ -224,9 +223,12 @@ int main(int argc, char** argv){
 
   // std::cout<<"\nAdded fOutput to fCylm ("<<fOutput->GetEntries()<<","<<fOutput->GetSize()<<")"<<std::endl;
   // std::cout<<std::endl;
-
+  TFile* fout = new TFile("output_cylm.root","RECREATE");
+  fCylm->Write();
+  fout->Close();
+  
   std::cout<<"Saving my list"<<std::endl;
-  TFile* fout = new TFile("output_list.root","RECREATE");
+  fout = new TFile("output_list.root","RECREATE");
   fout->cd();
   fOutput->Write("fOutput",1);
   // fout->ls();
@@ -247,8 +249,8 @@ int main(int argc, char** argv){
 
   std::cout<<"Saving database statistics"<<std::endl;
   fout = new TFile("database_stats.root","RECREATE");
-  dFlowPart1->getStatsHisto()->Write("hStats_pi");
-  dFlowPart2->getStatsHisto()->Write("hStats_K");
+  dFlowPart1->GetStatsHisto()->Write("hStats_pi");
+  dFlowPart2->GetStatsHisto()->Write("hStats_K");
   fout->Close();
 
   //fCylm->Wrie();

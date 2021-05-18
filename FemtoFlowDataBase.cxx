@@ -1,19 +1,19 @@
 #include "FemtoFlowDataBase.h"
 
-double flowHarmonics(double *x, double *par)
+Double_t flowHarmonics(Double_t *x, Double_t *par)
 {
-    double val = 1.;
-    for (int i = 0; i < 4; i++)
+    Double_t val = 1.;
+    for (Int_t i = 0; i < 4; i++)
     {
         val += 2. * par[i] * TMath::Cos((i + 2.) * x[0]);
     }
     return val;
 }
 
-double flowDistribution(double *x, double *par)
+Double_t flowDistribution(Double_t *x, Double_t *par)
 {
-  double val = x[0];
-  for(int i=0; i<4; i++)
+  Double_t val = x[0];
+  for(Int_t i=0; i<4; i++)
   {
     val += 2. * par[i] / (i+2.) * TMath::Sin((i + 2.) * x[0]);
     //val += par[i] * TMath::ASin((i + 2.) * x[0] / 2.0) / (i + 2.);
@@ -26,29 +26,28 @@ double flowDistribution(double *x, double *par)
 * Basic constructor for the class.
 * Note: there have to be separate objects for particles with different pdg
 */
-FemtoFlowDataBase::FemtoFlowDataBase( int pdg, const char* tableName, double energy, const char* centrality,const char* experiment)
+FemtoFlowDataBase::FemtoFlowDataBase( Int_t pdg, const char* tableName, Double_t energy, const char* centrality,const char* experiment)
 {
   kServer = TSQLServer::Connect("mysql://localhost/flow","vm","Pass1234"); //connect to the database
-  // kFlow = new TF1(Form("flow_%d",pdg), flowHarmonics, 0, TMath::TwoPi(), 4); //create function for flowharmonics
-  kFlow = new TF1(Form("flow_%d",pdg), flowHarmonics, -TMath::Pi(), TMath::Pi(), 4); //create function for flowharmonics
-  kDist = new TF1(Form("dist_%d", pdg), flowDistribution, -TMath::Pi(), TMath::Pi(), 4);
-  kFlow->SetParameters(0.0,0.0,0.0,0.0);
-  kDist->SetParameters(0.0,0.0,0.0,0.0);
-  kVm = new double[4];
-  kPT = new double[2];
-  kPdg = pdg;
-  kTableName = tableName;
-  kCentrality = centrality;
-  kExperiment = experiment;
-  kEnergy = energy;
+  fFlow = new TF1(Form("flow_%d",pdg), flowHarmonics, -TMath::Pi(), TMath::Pi(), 4); //create function for flowharmonics
+  fFlow->SetParameters(0.0,0.0,0.0,0.0);
+  fDist = new TF1(Form("dist_%d", pdg), flowDistribution, -TMath::Pi(), TMath::Pi(), 4);
+  fDist->SetParameters(0.0,0.0,0.0,0.0);
+  fVm = new double[4];
+  fPT = new double[2];
+  fPDG = pdg;
+  fTableName = tableName;
+  fCentrality = centrality;
+  fExperiment = experiment;
+  fEnergy = energy;
 
-  gVm[0] = new TGraphErrors();
-  gVm[0]->SetTitle(Form("v_{2} for %d;p_{T} (GeV);v_{2}", pdg));
+  fVmGraph[0] = new TGraphErrors();
+  fVmGraph[0]->SetTitle(Form("v_{2} for %d;p_{T} (GeV);v_{2}", pdg));
 
-  gVm[1] = new TGraphErrors();
-  gVm[1]->SetTitle(Form("v_{3} for %d;p_{T} (GeV);v_{3}", pdg));
+  fVmGraph[1] = new TGraphErrors();
+  fVmGraph[1]->SetTitle(Form("v_{3} for %d;p_{T} (GeV);v_{3}", pdg));
 
-  hStats = new TH2D(Form("hStats_%d",pdg), Form("#phi(pT) vs pT histogram (%d);pT (GeV); #phi(pT);entries",pdg),100,0,3,100,-TMath::Pi(),TMath::Pi());
+  fStats = new TH2D(Form("hStats_%d",pdg), Form("#phi(pT) vs pT histogram (%d);pT (GeV); #phi(pT);entries",pdg),100,0,3,100,-TMath::Pi(),TMath::Pi());
 }
 
 /*
@@ -56,42 +55,42 @@ FemtoFlowDataBase::FemtoFlowDataBase( int pdg, const char* tableName, double ene
 */
 FemtoFlowDataBase::~FemtoFlowDataBase(){
   if(kServer != nullptr) delete kServer;
-  if(kFlow != nullptr) delete kFlow;
-  if(kVm != nullptr) delete kVm;
-  if(kPT != nullptr) delete kPT;
+  if(fFlow != nullptr) delete fFlow;
+  if(fVm != nullptr) delete fVm;
+  if(fPT != nullptr) delete fPT;
 
-  if(gVm[0] != nullptr) delete gVm[0];
-  if(gVm[1] != nullptr) delete gVm[1];
+  if(fVmGraph[0] != nullptr) delete fVmGraph[0];
+  if(fVmGraph[1] != nullptr) delete fVmGraph[1];
 
-  if(hStats != nullptr) delete hStats;
+  if(fStats != nullptr) delete fStats;
 }
 
 
 /*
 * Function connects to the database and downloads all vn(pT), then stores them
 * as TGraphErrors objects inside the class object.
-* Parameters are selected according to the kTableName, kExperiment, kEnergy,
-* kCentrality and pdg
+* Parameters are selected according to the fTableName, fExperiment, fEnergy,
+* fCentrality and fPDG
 * It returns number of parameters vn for which data was found in the database
 */
-int FemtoFlowDataBase::downloadGraphs(){
-  int parameters = 0;
+Int_t FemtoFlowDataBase::DownloadGraphs(){
+  Int_t parameters = 0;
 
   const char* vm_param[4] = {"v2","v3", "v4", "v5"}; //for now only v2 and v3 stored in the database. We work on that later
-  int n; // number of rows found in the database for the given vn
-  double p;
-  double p_low = 0;
-  double p_high = 0;
-  double vm=0;
-  double statM = 0;
-  double statP = 0;
-  double sysM = 0;
-  double sysP = 0;
-  this->kPT[0] = 10.0; //begining of the pT range
-  this->kPT[1] = 0.0; // end of the pT range
-  for(int i=0; i<2;i++){
+  Int_t n; // number of rows found in the database for the given vn
+  Double_t p;
+  Double_t p_low = 0;
+  Double_t p_high = 0;
+  Double_t vm=0;
+  Double_t statM = 0;
+  Double_t statP = 0;
+  Double_t sysM = 0;
+  Double_t sysP = 0;
+  this->fPT[0] = 10.0; //begining of the pT range
+  this->fPT[1] = 0.0; // end of the pT range
+  for(Int_t i=0; i<2;i++){
     TString sql_statement = Form("SELECT pT, pT_LOW, pT_HIGH, %s, %s_statM, %s_statP, %s_sysM, %s_sysP FROM %s WHERE %s IS NOT NULL AND energy = %f AND experiment = \"%s\" AND centrality = \"%s\" AND pdg = %d;",
-                                  vm_param[i],vm_param[i],vm_param[i],vm_param[i],vm_param[i],kTableName,vm_param[i],kEnergy,kExperiment,kCentrality,kPdg);
+				 vm_param[i],vm_param[i],vm_param[i],vm_param[i],vm_param[i],fTableName,vm_param[i],fEnergy,fExperiment,fCentrality,fPDG);
     TSQLStatement* stmt = kServer->Statement(sql_statement.Data(),2048);
     n=0;
 
@@ -108,13 +107,13 @@ int FemtoFlowDataBase::downloadGraphs(){
         sysM = stmt->GetDouble(6);
         sysP = stmt->GetDouble(7);
 
-        if(p<this->kPT[0]) this->kPT[0] = p; //updating lower range limit
-        if(p>this->kPT[1]) this->kPT[1] = p; //updating higher range limit
+        if(p<this->fPT[0]) this->fPT[0] = p; //updating lower range limit
+        if(p>this->fPT[1]) this->fPT[1] = p; //updating higher range limit
 
-        gVm[i]->SetPoint(n,p,vm);
+        fVmGraph[i]->SetPoint(n,p,vm);
         // setting error bars according to the database
-        if(p == p_high) gVm[i]->SetPointError(n, (p_high - p_low)/2.0,statP+sysP);
-        else gVm[i]->SetPointError(n, p_high - p, statP+statM);
+        if(p == p_high) fVmGraph[i]->SetPointError(n, (p_high - p_low)/2.0,statP+sysP);
+        else fVmGraph[i]->SetPointError(n, p_high - p, statP+statM);
         n++;
       }
       if(n>0) parameters++; // a parameter found
@@ -130,18 +129,18 @@ int FemtoFlowDataBase::downloadGraphs(){
 /*
 * Returns random phi from the distribution according to the flow harmonics
 */
-double FemtoFlowDataBase::getPhi(double pT){
-  double phi = 0.0;
-  this->getVms(pT);
+Double_t FemtoFlowDataBase::GetPhi(Double_t pT){
+  Double_t phi = 0.0;
+  this->GetVms(pT);
 
-  kDist->SetParameters(this->kVm[0],this->kVm[1],this->kVm[2],this->kVm[3]);
-  phi = kDist->GetX(gRandom->Rndm() * TMath::TwoPi() - TMath::Pi());
-  hStats->Fill(pT,phi);
+  fDist->SetParameters(this->fVm[0],this->fVm[1],this->fVm[2],this->fVm[3]);
+  phi = fDist->GetX(gRandom->Rndm() * TMath::TwoPi() - TMath::Pi());
+  fStats->Fill(pT,phi);
   return phi;
 }
 
 /*******************************************
-*getVms(double)* - function to set Vm parameters
+*getVms(Double_t)* - function to set Vm parameters
 (v1, v2, v3, etc) for the given pT (saved
 in class stracture). Parameters are taken
 from the databse.
@@ -151,24 +150,16 @@ from the databse.
   for which we calculate the spherical harmonics
 
 *******************************************/
-void FemtoFlowDataBase::getVms(double pT){
+void FemtoFlowDataBase::GetVms(Double_t pT){
 
-  kVm[0] = 0.0; // v2
-  kVm[1] = 0.0;  // v3
-  kVm[2] = 0.0;  // v4 is not in the database (yet)
-  kVm[3] = 0.0;  // v5 is not in the database (yet)
+  fVm[0] = 0.0; // v2
+  fVm[1] = 0.0;  // v3
+  fVm[2] = 0.0;  // v4 is not in the database (yet)
+  fVm[3] = 0.0;  // v5 is not in the database (yet)
 
   for(int i=0; i<2;i++){
-    kVm[i] = gVm[i]->Eval(pT);
+    fVm[i] = fVmGraph[i]->Eval(pT);
   }
-}
-
-/*
-* Returns a pointer to TGraphErrors object with a graph of the vn parameter (n = vParam)
-* which was created with the database
-*/
-TGraphErrors* FemtoFlowDataBase::getGraph(int vParam){
-  return gVm[vParam]; //vParam = 0 -> v2; vParam = 1 -> v3
 }
 
 /*
@@ -176,35 +167,15 @@ TGraphErrors* FemtoFlowDataBase::getGraph(int vParam){
 * Also says if it managed to connect to the database
 */
 
-void FemtoFlowDataBase::showParams(){
+void FemtoFlowDataBase::ShowParams(){
   if(kServer->IsConnected()){
     std::cout<<"The flow database is connected"<<std::endl;
     std::cout<<"Your settings: "<<std::endl;
-    std::cout<<"\ttable: "<<kTableName<<std::endl;
-    std::cout<<"\texperiment: "<<kExperiment<<std::endl;
-    std::cout<<"\tenergy: "<<kEnergy<<std::endl;
-    std::cout<<"\tcentrality: "<<kCentrality<<std::endl;
+    std::cout<<"\ttable: "<<fTableName<<std::endl;
+    std::cout<<"\texperiment: "<<fExperiment<<std::endl;
+    std::cout<<"\tenergy: "<<fEnergy<<std::endl;
+    std::cout<<"\tcentrality: "<<fCentrality<<std::endl;
   }else{
     std::cout<<"ERROR::database not connected"<<std::endl;
   }
-}
-
-void FemtoFlowDataBase::setTableName(const char* tableName){
-  kTableName = tableName;
-}
-
-void FemtoFlowDataBase::setExperiment(const char* experiment){
-  kExperiment = experiment;
-}
-
-void FemtoFlowDataBase::setEnergy(double energy){
-  kEnergy = energy;
-}
-
-void FemtoFlowDataBase::setCentrality(const char* centrality){
-  kCentrality = centrality;
-}
-
-TH2D* FemtoFlowDataBase::getStatsHisto(){
-  return hStats;
 }
