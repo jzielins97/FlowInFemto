@@ -133,6 +133,7 @@ Double_t FemtoFlowDataBase::GetPhi(Double_t pT){
   Double_t phi = 0.0;
   this->GetVms(pT);
 
+  fFlow->SetParameters(this->fVm[0],this->fVm[1],this->fVm[2],this->fVm[3]);
   fDist->SetParameters(this->fVm[0],this->fVm[1],this->fVm[2],this->fVm[3]);
   phi = fDist->GetX(gRandom->Rndm() * TMath::TwoPi() - TMath::Pi());
   fStats->Fill(pT,phi);
