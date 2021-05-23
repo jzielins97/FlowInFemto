@@ -70,6 +70,7 @@ int main(int argc, char** argv){
   std::cout<<"N="<<N<<std::endl;
 
   fCylm = new CorrFctnDirectYlm("Cylm",1,50,0.0,0.5);
+  fCylm->AddToList(fOutput);
 
   ROOT::Math::PtEtaPhiE4D<double> v1(1, 1, 1, 1);
   ROOT::Math::PtEtaPhiE4D<double> v2(1, 1, 1, 1);
@@ -153,21 +154,14 @@ int main(int argc, char** argv){
     Double_t mks = (-v1b.Px() * tpy + v1b.Py() * tpx) / tpt;
     // Double_t mkol = mko;
     mko = (tmt / tm) * (mko - (tpt / tmt) * met);
-      
-    fCylm->AddRealPair(mko,mks,mkl,1.0);
+
+    Double_t mkv = TMath::Sqrt(mko*mko + mks*mks + mkl*mkl);
+    if(mkv<0.5) fCylm->AddRealPair(mko,mks,mkl,1.0);
 
     /***** creating den histogram **************/
-    pt1 = h_pt1->GetRandom();
-    pt2 = h_pt2->GetRandom();
-    while(pt1 < 0.19 || pt1 > 1.5) pt1 = h_pt1->GetRandom();
-    while(pt2 < 0.19 || pt2 > 1.5) pt2 = h_pt2->GetRandom();
-
     phi1 = gRandom->Rndm()*TMath::TwoPi() - TMath::Pi();
     phi2 = gRandom->Rndm()*TMath::TwoPi() - TMath::Pi();
 
-    eta1 = 2. * (gRandom->Rndm() - 0.5) * 0.8;
-    eta2 = 2. * (gRandom->Rndm() - 0.5) * 0.8;
-    
     v1.SetCoordinates(pt1, eta1, phi1, massPi);
     v2.SetCoordinates(pt2, eta2, phi2, massK);
 
@@ -214,7 +208,8 @@ int main(int argc, char** argv){
     // mkol = mko;
     mko = (tmt / tm) * (mko - (tpt / tmt) * met);
           
-    fCylm->AddMixedPair(mko,mks,mkl,1.0);
+    mkv = TMath::Sqrt(mko*mko + mks*mks + mkl*mkl);
+    if(mkv < 0.5) fCylm->AddMixedPair(mko,mks,mkl,1.0);
 
     if((i+1)%1000 == 0){
       printf("\r%6d/%d",i+1,N);
@@ -226,7 +221,7 @@ int main(int argc, char** argv){
   std::cout<<std::endl;
   std::cout<<"time: "<<timer->RealTime()<<"; CPU: "<<timer->CpuTime()<<std::endl;
   fCylm->Finish();
-  fCylm->AddToList(fOutput);
+  // fCylm->AddToList(fOutput);
 
 
   // std::cout<<"\nAdded fOutput to fCylm ("<<fOutput->GetEntries()<<","<<fOutput->GetSize()<<")"<<std::endl;

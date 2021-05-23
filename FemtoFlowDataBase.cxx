@@ -26,7 +26,7 @@ Double_t flowDistribution(Double_t *x, Double_t *par)
 * Basic constructor for the class.
 * Note: there have to be separate objects for particles with different pdg
 */
-FemtoFlowDataBase::FemtoFlowDataBase( Int_t pdg, const char* tableName, Double_t energy, const char* centrality,const char* experiment)
+FemtoFlowDataBase::FemtoFlowDataBase( Int_t pdg, const char* tableName, Double_t energy, const char* centrality, const char* eta, const char* experiment)
 {
   kServer = TSQLServer::Connect("mysql://localhost/flow","vm","Pass1234"); //connect to the database
   fFlow = new TF1(Form("flow_%d",pdg), flowHarmonics, -TMath::Pi(), TMath::Pi(), 4); //create function for flowharmonics
@@ -40,6 +40,7 @@ FemtoFlowDataBase::FemtoFlowDataBase( Int_t pdg, const char* tableName, Double_t
   fCentrality = centrality;
   fExperiment = experiment;
   fEnergy = energy;
+  fEta = eta;
 
   fVmGraph[0] = new TGraphErrors();
   fVmGraph[0]->SetTitle(Form("v_{2} for %d;p_{T} (GeV);v_{2}", pdg));
@@ -89,8 +90,8 @@ Int_t FemtoFlowDataBase::DownloadGraphs(){
   this->fPT[0] = 10.0; //begining of the pT range
   this->fPT[1] = 0.0; // end of the pT range
   for(Int_t i=0; i<2;i++){
-    TString sql_statement = Form("SELECT pT, pT_LOW, pT_HIGH, %s, %s_statM, %s_statP, %s_sysM, %s_sysP FROM %s WHERE %s IS NOT NULL AND energy = %f AND experiment = \"%s\" AND centrality = \"%s\" AND pdg = %d;",
-				 vm_param[i],vm_param[i],vm_param[i],vm_param[i],vm_param[i],fTableName,vm_param[i],fEnergy,fExperiment,fCentrality,fPDG);
+    TString sql_statement = Form("SELECT pT, pT_LOW, pT_HIGH, %s, %s_statM, %s_statP, %s_sysM, %s_sysP FROM %s WHERE %s IS NOT NULL AND energy = %f AND experiment = \"%s\" AND centrality = \"%s\" AND pdg = %d AND eta = \"%s\";",
+				 vm_param[i],vm_param[i],vm_param[i],vm_param[i],vm_param[i],fTableName,vm_param[i],fEnergy,fExperiment,fCentrality,fPDG,fEta);
     TSQLStatement* stmt = kServer->Statement(sql_statement.Data(),2048);
     n=0;
 
@@ -176,6 +177,7 @@ void FemtoFlowDataBase::ShowParams(){
     std::cout<<"\texperiment: "<<fExperiment<<std::endl;
     std::cout<<"\tenergy: "<<fEnergy<<std::endl;
     std::cout<<"\tcentrality: "<<fCentrality<<std::endl;
+    std::cout<<"\teta: "<<fEta<<std::endl;
   }else{
     std::cout<<"ERROR::database not connected"<<std::endl;
   }

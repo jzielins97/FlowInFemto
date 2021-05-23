@@ -23,6 +23,7 @@ private:
   const char* fExperiment; //experiment from which measurements were made
   Double_t fEnergy; //collision sqrt(sNN) in GeV
   const char* fCentrality; //centrality of the collision
+  const char* fEta; // absolute pseudorapidity range
   
   TF1 *fFlow; //flow harmonics for the given pT
   TF1 *fDist; //distribution for drawing random phi (based on the flow harmonics)
@@ -42,23 +43,27 @@ public:
                      const char* tableName = "PbPb",
                      Double_t energy = 2760,
                      const char* centrality = "0-5%",
+		     const char* eta = "<0.8",
                      const char* experiment = "ALICE");
   ~FemtoFlowDataBase();
   //public methods
+  Int_t DownloadGraphs(); //filling graphs with v parameters from the database
   Double_t GetPhi(Double_t pT); //returns a random phi with a distribution from spherical harmonics
   void ShowParams(); // prints parametrs used while connecting with the database
-  Int_t DownloadGraphs(); //filling graphs with v parameters from the database
 //setters
-  void SetTableName(const char* tableName){ fTableName = tableName; };
-  void SetExperimentName(const char* experiment){ fExperiment = experiment; };
-  void SetEnergy(Double_t energy){ fEnergy = energy; };
   void SetCentrality(const char* centrality){ fCentrality = centrality; };
+  void SetEnergy(Double_t energy){ fEnergy = energy; };
+  void SetEta(const char* eta){ fEta = eta; };
+  void SetExperimentName(const char* experiment){ fExperiment = experiment; };
+  void SetTableName(const char* tableName){ fTableName = tableName; };
 //getters
+  const char* GetCentrality(){ return fCentrality; };
+  Double_t GetEnergy(){ return fEnergy; };
+  const char* GetEta(){ return fEta; };
+  const char* GetExperimentName(){ return fExperiment; };
   Int_t GetPDG(){ return fPDG; };
   const char* GetTableName(){ return fTableName; };
-  const char* GetExperimentName(){ return fExperiment; };
-  Double_t GetEnergy(){ return fEnergy; };
-  const char* GetCentrality(){ return fCentrality; };
+  
 
   TF1* GetFlowHarmonics(){ return fFlow; };
   TF1* GetFlowIntegral(){ return fDist; };
