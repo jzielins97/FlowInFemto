@@ -187,7 +187,7 @@ int main(int argc, char** argv){
   std::cout<<"Saving my list"<<std::endl;
   fout = new TFile("output_list.root","RECREATE");
   fout->cd();
-  fOutput->Write("fOutput",1);
+  fOutput->Write();
   // fout->ls();
   fout->Close();
   
