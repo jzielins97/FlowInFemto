@@ -157,9 +157,17 @@ int main(int argc, char** argv){
     fCylm->AddRealPair(mko,mks,mkl,1.0);
 
     /***** creating den histogram **************/
+    pt1 = h_pt1->GetRandom();
+    pt2 = h_pt2->GetRandom();
+    while(pt1 < 0.19 || pt1 > 1.5) pt1 = h_pt1->GetRandom();
+    while(pt2 < 0.19 || pt2 > 1.5) pt2 = h_pt2->GetRandom();
+
     phi1 = gRandom->Rndm()*TMath::TwoPi() - TMath::Pi();
     phi2 = gRandom->Rndm()*TMath::TwoPi() - TMath::Pi();
 
+    eta1 = 2. * (gRandom->Rndm() - 0.5) * 0.8;
+    eta2 = 2. * (gRandom->Rndm() - 0.5) * 0.8;
+    
     v1.SetCoordinates(pt1, eta1, phi1, massPi);
     v2.SetCoordinates(pt2, eta2, phi2, massK);
 
