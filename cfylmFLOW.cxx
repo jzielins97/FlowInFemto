@@ -101,35 +101,7 @@ int main(int argc, char** argv){
 
     v1b.SetPxPyPzE(v1.Px(), v1.Py(), v1.Pz(), sqrt(massPi * massPi + v1.Px() * v1.Px() + v1.Py() * v1.Py() + v1.Pz() * v1.Pz()));
     v2b.SetPxPyPzE(v2.Px(), v2.Py(), v2.Pz(), sqrt(massK * massK + v2.Px() * v2.Px() + v2.Py() * v2.Py() + v2.Pz() * v2.Pz()));
-
-    // vsumb = v1b + v2b;
-
-    // TVector3 boost;// = vsumb.BoostVector();
-    // boost.SetXYZ(0.0,0.0,(v1b.Pz()+v2b.Pz())/(v1b.E()+v2b.E()));
-    // v1b.Boost(-boost);
-    // v2b.Boost(-boost);
-
-    // std::cout<<"v1.Px="<<v1.Px()<<" v1.Py="<<v1.Py()<<" v2.Px="<<v2.Px()<<" v2.Py="<<v2.Py()<<std::endl;
-    // std::cout<<boost.X()<<". "<<boost.Y()<<std::endl;
-    // std::cout<<"v1b.Px="<<v1b.Px()<<" v1b.Py="<<v1b.Py()<<" v1b.Px="<<v2b.Px()<<" v2b.Py="<<v2b.Py()<<std::endl;
-    // std::cout<<"\tv1b.Px+v2b.Px="<<v1b.Px()+v2b.Px()<<" v1b.Py+v2b.Py="<<v1b.Py()+v2b.Py()<<std::endl;
-
-    // if(isnan(v1b.Px()) || isnan(v2b.Px())){
-    //   std::cout<<"\tThere is a nan"<<std::endl;
-    // }
-    // Float_t kt = 0.5 * TMath::Hypot(v1b.Px() + v2b.Px(), v1b.Py() + v2b.Py());
-
-    // Float_t pXsum = v1b.Px() + v2b.Px();
-    // Float_t pYsum = v2b.Py() + v2b.Py();
-    // Float_t pXdif = v1b.Px() - v2b.Px();
-    // Float_t pYdif = v1b.Py() - v2b.Py();
-
-    // Float_t mko = 0.5 * (pXsum * pXdif + pYsum * pYdif) / kt;
-    // Float_t mks = (v1b.Px() * v2b.Py() - v1b.Py() * v2b.Px()) / kt;
-    // Float_t mkl = v1b.Pz() - v2b.Pz();
-
-    //std::cout<<mko<<","<<mks<<","<<mkl<<"("<<TMath::Sqrt(mko*mko + mks*mks + mkl*mkl)<<")"<<std::endl;
-
+    
     // sum the 4-vector components of both particles
     //total px, py, pz and E
     Double_t tpx = v1b.Px() + v2b.Px();
@@ -168,23 +140,8 @@ int main(int argc, char** argv){
     v1b.SetPxPyPzE(v1.Px(), v1.Py(), v1.Pz(), sqrt(massPi * massPi + v1.Px() * v1.Px() + v1.Py() * v1.Py() + v1.Pz() * v1.Pz()));
     v2b.SetPxPyPzE(v2.Px(), v2.Py(), v2.Pz(), sqrt(massK * massK + v2.Px() * v2.Px() + v2.Py() * v2.Py() + v2.Pz() * v2.Pz()));
 
-    // vsumb = v1b + v2b;
-
-    // boost = vsumb.BoostVector();
-    // boost.SetXYZ(0.0,0.0,(v1b.Pz()+v2b.Pz())/(v1b.E()+v2b.E()));
-    // v1b.Boost(-boost);
-    // v2b.Boost(-boost);
-    // kt = 0.5 * TMath::Hypot(v1b.X() + v2b.X(), v1b.Y() + v2b.Y());
-
-    // pXsum = v1b.X() + v2b.X();
-    // pYsum = v2b.Y() + v2b.Y();
-    // pXdif = v1b.X() - v2b.X();
-    // pYdif = v1b.Y() - v2b.Y();
-
-    // mko = 0.5 * (pXsum * pXdif + pYsum * pYdif) / kt;
-    // mks = (v1b.X() * v2b.Y() - v1b.Y() * v2b.X()) / kt;
-    // mkl = v1b.Z() - v2b.Z();
-
+    // sum the 4-vector components of both particles
+    //total px, py, pz and E
     tpx = v1b.Px() + v2b.Px();
     tpy = v1b.Py() + v2b.Py();
     tpz = v1b.Pz() + v2b.Pz();
@@ -220,12 +177,9 @@ int main(int argc, char** argv){
   timer->Stop();
   std::cout<<std::endl;
   std::cout<<"time: "<<timer->RealTime()<<"; CPU: "<<timer->CpuTime()<<std::endl;
-  fCylm->Finish();
+  //fCylm->Finish();
   // fCylm->AddToList(fOutput);
 
-
-  // std::cout<<"\nAdded fOutput to fCylm ("<<fOutput->GetEntries()<<","<<fOutput->GetSize()<<")"<<std::endl;
-  // std::cout<<std::endl;
   TFile* fout = new TFile("output_cylm.root","RECREATE");
   fCylm->Write();
   fout->Close();
@@ -236,17 +190,6 @@ int main(int argc, char** argv){
   fOutput->Write("fOutput",1);
   // fout->ls();
   fout->Close();
-
-  //  std::cout<<"Saving cf (spherical harmonics)"<<std::endl;
-  //  fout = new TFile("cf_hists.root","RECREATE");
-  //  fout->cd();
-  //  for(int il=0;il<4;il++){
-  //    for(int im=0;im<=il;im++){
-  //      fCylm->GetCfnRealHist(il,im)->Write(Form("CfReYlm%d%dCylm",il,im));
-  //      fCylm->GetCfnImagHist(il,im)->Write(Form("CfImYlm%d%dCylm",il,im));
-  //    }
-  //  }      
-  //  fout->Close();
   
   fOutput->Clear();
 
