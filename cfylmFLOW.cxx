@@ -69,7 +69,7 @@ int main(int argc, char** argv){
   int N = atoi(argv[5]);
   std::cout<<"N="<<N<<std::endl;
 
-  fCylm = new CorrFctnDirectYlm("Cylm",1,100,0.0,0.5);
+  fCylm = new CorrFctnDirectYlm("Cylm",1,50,0.0,0.5);
 
   ROOT::Math::PtEtaPhiE4D<double> v1(1, 1, 1, 1);
   ROOT::Math::PtEtaPhiE4D<double> v2(1, 1, 1, 1);

@@ -1849,11 +1849,11 @@ void CorrFctnDirectYlm::ReadFromFile(TFile *infile, const char *name, int maxl)
 //     cout << "Reading " << ihist << " " << elsi[ihist] << " " << (emsi[ihist]<0 ? elsi[ihist]-emsi[ihist] : emsi[ihist]) << " " << bufname << endl;
 //     cout << numsimag[ihist]->GetBinContent(1) <<endl;
 
-    sprintf(bufname, "NumReYlm%i%i%sBase", elsi[ihist], emsi[ihist]<0 ? elsi[ihist]-emsi[ihist] : emsi[ihist], name);
+    sprintf(bufname, "DenReYlm%i%i%s", elsi[ihist], emsi[ihist]<0 ? elsi[ihist]-emsi[ihist] : emsi[ihist], name);
     if (densreal[ihist]) delete densreal[ihist];
     densreal[ihist] = new TH1D(*((TH1D *) infile->Get(bufname)));
 
-    sprintf(bufname, "NumImYlm%i%i%sBase", elsi[ihist], emsi[ihist]<0 ? elsi[ihist]-emsi[ihist] : emsi[ihist], name);
+    sprintf(bufname, "DenImYlm%i%i%s", elsi[ihist], emsi[ihist]<0 ? elsi[ihist]-emsi[ihist] : emsi[ihist], name);
     if (densimag[ihist]) delete densimag[ihist];
     densimag[ihist] = new TH1D(*((TH1D *) infile->Get(bufname)));
   }
