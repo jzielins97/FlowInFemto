@@ -6,8 +6,8 @@
 #include "TH1D.h"
 #include "TList.h"
 #include "TLorentzVector.h"
-#include "Math/GenVector/PxPyPzE4D.h"
-#include "Math/GenVector/PtEtaPhiE4D.h"
+//#include "Math/GenVector/PxPyPzE4D.h"
+#include "Math/GenVector/PtEtaPhiM4D.h"
 #include "TRandom.h"
 #include "TStopwatch.h"
 
@@ -72,9 +72,9 @@ int main(int argc, char** argv){
   fCylm = new CorrFctnDirectYlm("Cylm",1,50,0.0,0.5);
   fCylm->AddToList(fOutput);
 
-  ROOT::Math::PtEtaPhiE4D<double> v1(1, 1, 1, 1);
-  ROOT::Math::PtEtaPhiE4D<double> v2(1, 1, 1, 1);
-  ROOT::Math::PtEtaPhiE4D<double> vsum(1, 1, 1, 1);
+  ROOT::Math::PtEtaPhiM4D<double> v1(1, 1, 1, 1);
+  ROOT::Math::PtEtaPhiM4D<double> v2(1, 1, 1, 1);
+  ROOT::Math::PtEtaPhiM4D<double> vsum(1, 1, 1, 1);
 
   TLorentzVector v1b;
   TLorentzVector v2b;
@@ -177,7 +177,7 @@ int main(int argc, char** argv){
   timer->Stop();
   std::cout<<std::endl;
   std::cout<<"time: "<<timer->RealTime()<<"; CPU: "<<timer->CpuTime()<<std::endl;
-  //fCylm->Finish();
+  fCylm->Finish();
   // fCylm->AddToList(fOutput);
 
   TFile* fout = new TFile("output_cylm.root","RECREATE");
