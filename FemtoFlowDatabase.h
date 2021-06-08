@@ -14,7 +14,7 @@
 #include <TSQLStatement.h>
 #include <TRandom.h>
 
-class FemtoFlowDataBase {
+class FemtoFlowDatabase {
 private:
   //Data memebers
   Int_t fPDG; // pdg of the particle we want to get vm for
@@ -26,7 +26,7 @@ private:
   const char* fEta; // absolute pseudorapidity range
   
   TF1 *fFlow; //flow harmonics for the given pT
-  TF1 *fDist; //distribution for drawing random phi (based on the flow harmonics)
+  TF1 *fIntegral; //distribution for drawing random phi (based on the flow harmonics)
   
   Double_t* fPT; //table with pT range (stores what's the lowest and highest pT for which v parameters were found in the database)
   Double_t* fVm; //table with vm parameters at given time
@@ -39,13 +39,13 @@ private:
 
 public:
   //constructor with specified particle pdg
-  FemtoFlowDataBase( Int_t pdg,
+  FemtoFlowDatabase( Int_t pdg,
                      const char* tableName = "PbPb",
                      Double_t energy = 2760,
                      const char* centrality = "0-5%",
 		     const char* eta = "<0.8",
                      const char* experiment = "ALICE");
-  ~FemtoFlowDataBase();
+  ~FemtoFlowDatabase();
   //public methods
   Int_t DownloadGraphs(); //filling graphs with v parameters from the database
   Double_t GetPhi(Double_t pT); //returns a random phi with a distribution from spherical harmonics
@@ -65,8 +65,8 @@ public:
   const char* GetTableName(){ return fTableName; };
   
 
-  TF1* GetFlowHarmonics(){ return fFlow; };
-  TF1* GetFlowIntegral(){ return fDist; };
+  TF1* GetFlowHarmonics();
+  TF1* GetFlowIntegral();
 
   /* Returns a pointer to TGraphErrors object with a graph of the vn parameter (n = vParam)
    which was created with the database */
@@ -75,5 +75,5 @@ public:
 };
 
 Double_t flowHarmonics(Double_t *x, Double_t *par); // function to generate angle distribution according to the flow (v2 and v3)
-Double_t flowDistribution(Double_t *x, Double_t *par);  // function to get phi with distribution from flowHarmonics
+Double_t flowIntegral(Double_t *x, Double_t *par);  // function to get phi with distribution from flowHarmonics
 #endif

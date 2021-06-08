@@ -13,13 +13,13 @@ all: CfBackgroundFlow
 CorrFctnDirectYlm.o: CorrFctnDirectYlm.cxx CorrFctnDirectYlm.h sf.h
 	$(CC) $< -o $@ $(CCFLAGS) -c
 
-FemtoFlowDataBase.o: FemtoFlowDataBase.cxx FemtoFlowDataBase.h
+FemtoFlowDatabase.o: FemtoFlowDatabase.cxx FemtoFlowDatabase.h
 	$(CC) $< -o $@ $(CCFLAGS) -c
 
 cfylmFLOW.o: cfylmFLOW.cxx
 	$(CC) $< -o $@ $(CCFLAGS) -c
 
-CfBackgroundFlow: cfylmFLOW.o CorrFctnDirectYlm.o FemtoFlowDataBase.o ylm.o
+CfBackgroundFlow: cfylmFLOW.o CorrFctnDirectYlm.o FemtoFlowDatabase.o ylm.o
 	$(LD) -o $@ $^ $(LDFLAGS)
 
 clean:

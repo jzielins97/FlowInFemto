@@ -1,4 +1,4 @@
-#include "FemtoFlowDataBase.h"
+#include "FemtoFlowDatabase.h"
 #include "CorrFctnDirectYlm.h"
 #include "TFile.h"
 #include "TNtuple.h"
@@ -21,8 +21,8 @@ int main(int argc, char** argv){
   TH1F* h_pt2=0;
 
   CorrFctnDirectYlm* fCylm;
-  FemtoFlowDataBase* dFlowPart1;
-  FemtoFlowDataBase* dFlowPart2;
+  FemtoFlowDatabase* dFlowPart1;
+  FemtoFlowDatabase* dFlowPart2;
 
   Double_t massPi = 0.139570;
   Double_t massK = 0.493677;
@@ -39,7 +39,7 @@ int main(int argc, char** argv){
 //setting up first particle
   //database:
   pdg1 = atoi(argv[1]);
-  dFlowPart1 = new FemtoFlowDataBase(TMath::Abs(pdg1));
+  dFlowPart1 = new FemtoFlowDatabase(TMath::Abs(pdg1));
   dFlowPart1->SetExperimentName("ALICE");
   dFlowPart1->SetEnergy(2760);
   dFlowPart1->SetTableName("PbPb");
@@ -56,7 +56,7 @@ int main(int argc, char** argv){
 //setting up second particle
   //database:
   pdg2 = atoi(argv[3]);
-  dFlowPart2 = new FemtoFlowDataBase(TMath::Abs(pdg2));
+  dFlowPart2 = new FemtoFlowDatabase(TMath::Abs(pdg2));
   dFlowPart2->SetCentrality(centrality);
   dFlowPart2->ShowParams();
   int foundVnForPart2 = dFlowPart2->DownloadGraphs();
@@ -177,6 +177,7 @@ int main(int argc, char** argv){
   timer->Stop();
   std::cout<<std::endl;
   std::cout<<"time: "<<timer->RealTime()<<"; CPU: "<<timer->CpuTime()<<std::endl;
+  fCylm->FillCovariances();
   fCylm->Finish();
   // fCylm->AddToList(fOutput);
 

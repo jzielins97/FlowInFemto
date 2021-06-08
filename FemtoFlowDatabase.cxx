@@ -1,4 +1,4 @@
-#include "FemtoFlowDataBase.h"
+#include "FemtoFlowDatabase.h"
 
 Double_t flowHarmonics(Double_t *x, Double_t *par)
 {
@@ -10,7 +10,7 @@ Double_t flowHarmonics(Double_t *x, Double_t *par)
     return val;
 }
 
-Double_t flowDistribution(Double_t *x, Double_t *par)
+Double_t flowIntegral(Double_t *x, Double_t *par)
 {
   Double_t val = x[0];
   for(Int_t i=0; i<4; i++)
@@ -26,14 +26,18 @@ Double_t flowDistribution(Double_t *x, Double_t *par)
 * Basic constructor for the class.
 * Note: there have to be separate objects for particles with different pdg
 */
-FemtoFlowDataBase::FemtoFlowDataBase( Int_t pdg, const char* tableName, Double_t energy, const char* centrality, const char* eta, const char* experiment)
+FemtoFlowDatabase::FemtoFlowDatabase( Int_t pdg, const char* tableName, Double_t energy, const char* centrality, const char* eta, const char* experiment)
 {
   kServer = TSQLServer::Connect("mysql://localhost/flow","vm","Pass1234"); //connect to the database
   fFlow = new TF1(Form("flow_%d",pdg), flowHarmonics, -TMath::Pi(), TMath::Pi(), 4); //create function for flowharmonics
   fFlow->SetParameters(0.0,0.0,0.0,0.0);
-  fDist = new TF1(Form("dist_%d", pdg), flowDistribution, -TMath::Pi(), TMath::Pi(), 4);
-  fDist->SetParameters(0.0,0.0,0.0,0.0);
+  fIntegral = new TF1(Form("int_%d", pdg), flowIntegral, -TMath::Pi(), TMath::Pi(), 4);
+  fIntegral->SetParameters(0.0,0.0,0.0,0.0);
   fVm = new double[4];
+  fVm[0] = 0;
+  fVm[1] = 0;
+  fVm[2] = 0;
+  fVm[3] = 0;
   fPT = new double[2];
   fPDG = pdg;
   fTableName = tableName;
@@ -54,7 +58,7 @@ FemtoFlowDataBase::FemtoFlowDataBase( Int_t pdg, const char* tableName, Double_t
 /*
 * Basic destructor of the class
 */
-FemtoFlowDataBase::~FemtoFlowDataBase(){
+FemtoFlowDatabase::~FemtoFlowDatabase(){
   if(kServer != nullptr) delete kServer;
   if(fFlow != nullptr) delete fFlow;
   if(fVm != nullptr) delete fVm;
@@ -74,7 +78,7 @@ FemtoFlowDataBase::~FemtoFlowDataBase(){
 * fCentrality and fPDG
 * It returns number of parameters vn for which data was found in the database
 */
-Int_t FemtoFlowDataBase::DownloadGraphs(){
+Int_t FemtoFlowDatabase::DownloadGraphs(){
   Int_t parameters = 0;
 
   const char* vm_param[4] = {"v2","v3", "v4", "v5"}; //for now only v2 and v3 stored in the database. We work on that later
@@ -130,13 +134,12 @@ Int_t FemtoFlowDataBase::DownloadGraphs(){
 /*
 * Returns random phi from the distribution according to the flow harmonics
 */
-Double_t FemtoFlowDataBase::GetPhi(Double_t pT){
+Double_t FemtoFlowDatabase::GetPhi(Double_t pT){
   Double_t phi = 0.0;
   this->GetVms(pT);
 
-  fFlow->SetParameters(this->fVm[0],this->fVm[1],this->fVm[2],this->fVm[3]);
-  fDist->SetParameters(this->fVm[0],this->fVm[1],this->fVm[2],this->fVm[3]);
-  phi = fDist->GetX(gRandom->Rndm() * TMath::TwoPi() - TMath::Pi());
+  fIntegral->SetParameters(this->fVm[0],this->fVm[1],this->fVm[2],this->fVm[3]);
+  phi = fIntegral->GetX(gRandom->Rndm() * TMath::TwoPi() - TMath::Pi());
   fStats->Fill(pT,phi);
   return phi;
 }
@@ -152,7 +155,7 @@ from the databse.
   for which we calculate the spherical harmonics
 
 *******************************************/
-void FemtoFlowDataBase::GetVms(Double_t pT){
+void FemtoFlowDatabase::GetVms(Double_t pT){
 
   fVm[0] = 0.0; // v2
   fVm[1] = 0.0;  // v3
@@ -164,12 +167,23 @@ void FemtoFlowDataBase::GetVms(Double_t pT){
   }
 }
 
+TF1* FemtoFlowDatabase::GetFlowHarmonics(){
+  fFlow->SetParameters(this->fVm[0],this->fVm[1],this->fVm[2],this->fVm[3]);
+  return fFlow;
+}
+
+TF1* FemtoFlowDatabase::GetFlowIntegral(){
+  fIntegral->SetParameters(this->fVm[0],this->fVm[1],this->fVm[2],this->fVm[3]);
+  return fIntegral;
+}
+
+
 /*
 * Prints all the information, which it will use while retrieving data from the database
 * Also says if it managed to connect to the database
 */
 
-void FemtoFlowDataBase::ShowParams(){
+void FemtoFlowDatabase::ShowParams(){
   if(kServer->IsConnected()){
     std::cout<<"The flow database is connected"<<std::endl;
     std::cout<<"Your settings: "<<std::endl;
