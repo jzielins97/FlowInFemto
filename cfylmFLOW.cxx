@@ -12,6 +12,7 @@
 #include "TStopwatch.h"
 
 int main(int argc, char** argv){
+  gRandom->SetSeed(0); //set new seed each time you run the program
   int pdg1, pdg2;
   TFile* fin1;
   TFile* fin2;

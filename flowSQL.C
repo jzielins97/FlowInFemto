@@ -103,7 +103,7 @@ void draw(TSQLServer* server, TString tName, TString v_param, TString centrality
 *    pdg        - pdg code of the particle
 *
 */
-void drawPDG(TSQLServer* server, TString tName, TString v_param, TString centrality, int pdg){
+void draw(TSQLServer* server, TString tName, TString v_param, TString centrality, int pdg){
   TSQLStatement* stmt = server->Statement(Form("SELECT pT,%s FROM %s WHERE (centrality = \'%s\') AND %s IS NOT NULL AND pdg = %d",v_param.Data(),tName.Data(),centrality.Data(), v_param.Data(), pdg),100);
 
   std::vector<double>* val1 = new std::vector<double>();

@@ -1,3 +1,10 @@
+/*   Class for connecting to the flow coefficients database
+//   and generating random angles with flow distribtions.
+//   Author: Jakub Zieliński
+//   Warsaw University of Technology
+//   email: jakub.stanislaw.zielinski@cern.ch
+*/
+
 #include "FemtoFlowDatabase.h"
 
 Double_t flowHarmonics(Double_t *x, Double_t *par)
@@ -20,7 +27,6 @@ Double_t flowIntegral(Double_t *x, Double_t *par)
   }
   return val;
 }
-
 
 /*
 * Basic constructor for the class.
@@ -69,7 +75,6 @@ FemtoFlowDatabase::~FemtoFlowDatabase(){
 
   if(fStats != nullptr) delete fStats;
 }
-
 
 /*
 * Function connects to the database and downloads all vn(pT), then stores them
@@ -176,7 +181,6 @@ TF1* FemtoFlowDatabase::GetFlowIntegral(){
   fIntegral->SetParameters(this->fVm[0],this->fVm[1],this->fVm[2],this->fVm[3]);
   return fIntegral;
 }
-
 
 /*
 * Prints all the information, which it will use while retrieving data from the database

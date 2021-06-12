@@ -1,3 +1,10 @@
+/*   Class for connecting to the flow coefficients database
+//   and generating random angles with flow distribtions.
+//   Author: Jakub Zieliński
+//   Warsaw University of Technology
+//   email: jakub.stanislaw.zielinski@cern.ch
+*/
+
 #ifndef _FEMTOFLOWDATABASE_H_
 #define _FEMTOFLOWDATABASE_H_
 
