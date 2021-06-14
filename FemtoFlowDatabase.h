@@ -1,6 +1,6 @@
 /*   Class for connecting to the flow coefficients database
 //   and generating random angles with flow distribtions.
-//   Author: Jakub Zieliński
+//   Author: Jakub Zielinski
 //   Warsaw University of Technology
 //   email: jakub.stanislaw.zielinski@cern.ch
 */
