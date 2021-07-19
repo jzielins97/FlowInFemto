@@ -31,8 +31,8 @@ int main(int argc, char** argv){
   const char* centrality = "0-5%";
 
   if(argc < 6){
-    std::cout<<"Error: not enough arguments. Needs: 4, was given: "<<argc-1<<"."<<std::endl;
-    std::cout<<"<particle #1 pdg> <pT distribution file #1> <particle #2 pdg> <pT distribution #2> <N>"<<std::endl;
+    std::cout<<"Error: not enough arguments. Needs: 5, was given: "<<argc-1<<"."<<std::endl;
+    std::cout<<"<particle #1 pdg> <pT distribution file #1> <particle #2 pdg> <pT distribution #2> <N> <centrality (optional)>"<<std::endl;
     return -1;
   }
   if(argc > 6) centrality = argv[6];
@@ -70,7 +70,7 @@ int main(int argc, char** argv){
   int N = atoi(argv[5]);
   std::cout<<"N="<<N<<std::endl;
 
-  fCylm = new CorrFctnDirectYlm("Cylm",1,50,0.0,0.5);
+  fCylm = new CorrFctnDirectYlm("Cylm",1,100,0.0,0.5);
   fCylm->AddToList(fOutput);
 
   ROOT::Math::PtEtaPhiM4D<double> v1(1, 1, 1, 1);
