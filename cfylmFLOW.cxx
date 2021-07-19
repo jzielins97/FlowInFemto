@@ -88,7 +88,7 @@ int main(int argc, char** argv){
     
     Double_t pt1 = h_pt1->GetRandom();
     Double_t pt2 = h_pt2->GetRandom();
-    while(pt1 < 0.19 || pt1 > 1.5) pt1 = h_pt1->GetRandom();
+    while(pt1 < 0.22 || pt1 > 1.5) pt1 = h_pt1->GetRandom();
     while(pt2 < 0.19 || pt2 > 1.5) pt2 = h_pt2->GetRandom();
 
     Double_t phi1 = dFlowPart1->GetPhi(pt1);
