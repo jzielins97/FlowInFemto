@@ -12,7 +12,7 @@ Double_t flowHarmonics(Double_t *x, Double_t *par)
     Double_t val = 1.;
     for (Int_t i = 0; i < 4; i++)
     {
-        val += 2. * par[i] * TMath::Cos((i + 2.) * x[0]);
+        val += 2. * par[i] * TMath::Cos((i + 1.) * x[0]);
     }
     return val;
 }
@@ -22,7 +22,7 @@ Double_t flowIntegral(Double_t *x, Double_t *par)
   Double_t val = x[0];
   for(Int_t i=0; i<4; i++)
   {
-    val += 2. * par[i] / (i+2.) * TMath::Sin((i + 2.) * x[0]);
+    val += 2. * par[i] / (i+1.) * TMath::Sin((i + 1.) * x[0]);
     //val += par[i] * TMath::ASin((i + 2.) * x[0] / 2.0) / (i + 2.);
   }
   return val;
@@ -72,6 +72,7 @@ FemtoFlowDatabase::~FemtoFlowDatabase(){
 
   if(fVmGraph[0] != nullptr) delete fVmGraph[0];
   if(fVmGraph[1] != nullptr) delete fVmGraph[1];
+  if(fVmGraph[1] != nullptr) delete fVmGraph[2];
 
   if(fStats != nullptr) delete fStats;
 }
@@ -139,9 +140,10 @@ Int_t FemtoFlowDatabase::DownloadGraphs(){
 /*
 * Returns random phi from the distribution according to the flow harmonics
 */
-Double_t FemtoFlowDatabase::GetPhi(Double_t pT){
+Double_t FemtoFlowDatabase::GetPhi(Double_t pT, Double_t eta){
+  //std::cout<<"\tGetting vms"<<std::endl;
   Double_t phi = 0.0;
-  this->GetVms(pT);
+  this->GetVms(pT, eta);
 
   fIntegral->SetParameters(this->fVm[0],this->fVm[1],this->fVm[2],this->fVm[3]);
   phi = fIntegral->GetX(gRandom->Rndm() * TMath::TwoPi() - TMath::Pi());
@@ -160,17 +162,18 @@ from the databse.
   for which we calculate the spherical harmonics
 
 *******************************************/
-void FemtoFlowDatabase::GetVms(Double_t pT){
-
-  fVm[0] = 0.0; // v2
-  fVm[1] = 0.0;  // v3
-  fVm[2] = 0.0;  // v4 is not in the database (yet)
-  fVm[3] = 0.0;  // v5 is not in the database (yet)
-
-  for(int i=0; i<2;i++){
-    fVm[i] = fVmGraph[i]->Eval(pT);
+  void FemtoFlowDatabase::GetVms(Double_t pT, Double_t eta){
+    
+    fVm[0] = - 0.75/0.8 * 10e-3 * eta;
+    fVm[1] = 0.0;  // v2
+    fVm[2] = 0.0;  // v3 is not in the database (yet)
+    fVm[3] = 0.0;  // v4 is not in the database (yet)
+    
+    for(int i=0; i<2;i++){
+      fVm[i+1] = fVmGraph[i]->Eval(pT);
+    }
+    //std::cout<<fVm[0]<<" "<<fVm[1]<<" "<<fVm[2]<<" "<<fVm[3]<<std::endl;
   }
-}
 
 TF1* FemtoFlowDatabase::GetFlowHarmonics(){
   fFlow->SetParameters(this->fVm[0],this->fVm[1],this->fVm[2],this->fVm[3]);

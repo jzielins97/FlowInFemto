@@ -42,7 +42,7 @@ private:
   TH2D* fStats; // 2D histogram filled with pairs (pT,phi(pT)) where phi(pT) are returns from eval from flow harmonics
 
   //Methods
-  void GetVms(Double_t pT);
+  void GetVms(Double_t pT, Double_t eta);
 
 public:
   //constructor with specified particle pdg
@@ -55,7 +55,7 @@ public:
   ~FemtoFlowDatabase();
   //public methods
   Int_t DownloadGraphs(); //filling graphs with v parameters from the database
-  Double_t GetPhi(Double_t pT); //returns a random phi with a distribution from spherical harmonics
+  Double_t GetPhi(Double_t pT, Double_t eta = 0.0); //returns a random phi with a distribution from spherical harmonics
   void ShowParams(); // prints parametrs used while connecting with the database
 //setters
   void SetCentrality(const char* centrality){ fCentrality = centrality; };

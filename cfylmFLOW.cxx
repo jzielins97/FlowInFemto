@@ -91,11 +91,12 @@ int main(int argc, char** argv){
     while(pt1 < 0.22 || pt1 > 1.5) pt1 = h_pt1->GetRandom();
     while(pt2 < 0.19 || pt2 > 1.5) pt2 = h_pt2->GetRandom();
 
-    Double_t phi1 = dFlowPart1->GetPhi(pt1);
-    Double_t phi2 = dFlowPart2->GetPhi(pt2);
-
     Double_t eta1 = 2. * (gRandom->Rndm() - 0.5) * 0.8;
     Double_t eta2 = 2. * (gRandom->Rndm() - 0.5) * 0.8;
+    
+    Double_t phi1 = dFlowPart1->GetPhi(pt1, eta1);
+    Double_t phi2 = dFlowPart2->GetPhi(pt2, eta2);
+
 
     v1.SetCoordinates(pt1, eta1, phi1, massPi);
     v2.SetCoordinates(pt2, eta2, phi2, massK);
