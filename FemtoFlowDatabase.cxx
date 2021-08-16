@@ -140,7 +140,7 @@ Int_t FemtoFlowDatabase::DownloadGraphs(){
 /*
 * Returns random phi from the distribution according to the flow harmonics
 */
-Double_t FemtoFlowDatabase::GetPhi(Double_t pT, Double_t eta){
+Double_t FemtoFlowDatabase::GetPhi(Double_t pT, Double_t eta = 0.0){
   //std::cout<<"\tGetting vms"<<std::endl;
   Double_t phi = 0.0;
   this->GetVms(pT, eta);
@@ -166,12 +166,13 @@ from the databse.
     
     fVm[0] = - 0.75/0.8 * 10e-3 * eta;
     fVm[1] = 0.0;  // v2
-    fVm[2] = 0.0;  // v3 is not in the database (yet)
-    fVm[3] = 0.0;  // v4 is not in the database (yet)
+    fVm[2] = 0.0;  // v3
     
     for(int i=0; i<2;i++){
       fVm[i+1] = fVmGraph[i]->Eval(pT);
     }
+
+    fVm[3] = 0.5 * fVm[2];;  // v4 is not in the database (yet)
     //std::cout<<fVm[0]<<" "<<fVm[1]<<" "<<fVm[2]<<" "<<fVm[3]<<std::endl;
   }
 

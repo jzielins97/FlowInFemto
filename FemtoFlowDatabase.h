@@ -55,7 +55,7 @@ public:
   ~FemtoFlowDatabase();
   //public methods
   Int_t DownloadGraphs(); //filling graphs with v parameters from the database
-  Double_t GetPhi(Double_t pT, Double_t eta = 0.0); //returns a random phi with a distribution from spherical harmonics
+  Double_t GetPhi(Double_t pT, Double_t eta); //returns a random phi with a distribution from spherical harmonics
   void ShowParams(); // prints parametrs used while connecting with the database
 //setters
   void SetCentrality(const char* centrality){ fCentrality = centrality; };
@@ -70,7 +70,11 @@ public:
   const char* GetExperimentName(){ return fExperiment; };
   Int_t GetPDG(){ return fPDG; };
   const char* GetTableName(){ return fTableName; };
-  
+  Double_t GetV1(){ return fVm[0];};
+  Double_t GetV2(){ return fVm[1];};
+  Double_t GetV3(){ return fVm[2];};
+  Double_t GetV4(){ return fVm[3];};
+  /******/
 
   TF1* GetFlowHarmonics();
   TF1* GetFlowIntegral();
