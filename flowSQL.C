@@ -329,11 +329,11 @@ int readCSV(const char* fileName, TSQLServer* server, TString tName, TString v_p
   }
 
   TSQLStatement* stmt = server->Statement(Form("SELECT COUNT(%s) FROM %s WHERE reference = \"%s\" AND pdg = NULL AND %s IS NOT NULL;", v_param.Data(), tName.Data(), reference.Data(), v_param.Data()),100);
-  stmt->StoreResult();
   if(stmt->Process()){
+    stmt->StoreResult();
     stmt->NextResultRow();
     if(stmt->GetInt(0) != 0){
-      std::cout<<"INFO: values from a table with this reference ("<<reference<<") has been already inserted into the "<<tName<<" table!"<<std::endl;
+      std::cout<<"INFO: values from the table with this reference ("<<reference<<") has been already inserted into the "<<tName<<" table!"<<std::endl;
       return 0;
     }
   }
@@ -387,11 +387,11 @@ int readCSVnotHist(const char* fileName, TSQLServer* server, TString tName, TStr
   }
 
   TSQLStatement* stmt = server->Statement(Form("SELECT COUNT(%s) FROM %s WHERE reference = \"%s\" AND pdg = NULL AND %s IS NOT NULL;", v_param.Data(), tName.Data(), reference.Data(), v_param.Data()),100);
-  stmt->StoreResult();
   if(stmt->Process()){
+    stmt->StoreResult();
     stmt->NextResultRow();
     if(stmt->GetInt(0) != 0){
-      std::cout<<"INFO: values from a table with this reference ("<<reference<<") has been already inserted into the "<<tName<<" table!"<<std::endl;
+      std::cout<<"INFO: values from the table with this reference ("<<reference<<") has been already inserted into the "<<tName<<" table!"<<std::endl;
       return 0;
     }
   }
@@ -506,11 +506,11 @@ int readCSV(const char* fileName, TSQLServer* server, TString tName, TString v_p
   }
 
   TSQLStatement* stmt = server->Statement(Form("SELECT COUNT(%s) FROM %s WHERE reference = \"%s\" AND pdg = %d AND %s IS NOT NULL;", v_param.Data(), tName.Data(), reference.Data(), pdg, v_param.Data()),100);
-  stmt->StoreResult();
   if(stmt->Process()){
+    stmt->StoreResult();
     stmt->NextResultRow();
     if(stmt->GetInt(0) != 0){
-      std::cout<<"INFO: values from a table with this reference ("<<reference<<") has been already inserted into the "<<tName<<" table!"<<std::endl;
+      std::cout<<"INFO: values from the table with this reference ("<<reference<<") has been already inserted into the "<<tName<<" table!"<<std::endl;
       return 0;
     }
   }
@@ -563,11 +563,11 @@ int readCSVnotHist(const char* fileName, TSQLServer* server, TString tName, TStr
   }
 
   TSQLStatement* stmt = server->Statement(Form("SELECT COUNT(%s) FROM %s WHERE reference = \"%s\" AND pdg = %d AND %s IS NOT NULL;", v_param.Data(), tName.Data(), reference.Data(), pdg, v_param.Data()),100);
-  stmt->StoreResult();
   if(stmt->Process()){
+    stmt->StoreResult();
     stmt->NextResultRow();
     if(stmt->GetInt(0) != 0){
-      std::cout<<"INFO: values from a table with this reference ("<<reference<<") has been already inserted into the "<<tName<<" table!"<<std::endl;
+      std::cout<<"INFO: values from the table with this reference ("<<reference<<") has been already inserted into the "<<tName<<" table!"<<std::endl;
       return 0;
     }
   }
