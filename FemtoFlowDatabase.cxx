@@ -100,8 +100,8 @@ Int_t FemtoFlowDatabase::DownloadGraphs(){
   this->fPT[0] = 10.0; //begining of the pT range
   this->fPT[1] = 0.0; // end of the pT range
   for(Int_t i=0; i<2;i++){
-    TString sql_statement = Form("SELECT pT, pT_LOW, pT_HIGH, %s, %s_statM, %s_statP, %s_sysM, %s_sysP FROM %s WHERE %s IS NOT NULL AND energy = %f AND experiment = \"%s\" AND centrality = \"%s\" AND pdg = %d AND eta = \"%s\";",
-				 vm_param[i],vm_param[i],vm_param[i],vm_param[i],vm_param[i],fTableName,vm_param[i],fEnergy,fExperiment,fCentrality,fPDG,fEta);
+    TString sql_statement = Form("SELECT pT, pT_LOW, pT_HIGH, %s, %s_statM, %s_statP, %s_sysM, %s_sysP FROM %s WHERE %s IS NOT NULL AND energy = %f AND experiment = \"%s\" AND centrality = \"%s\" AND pdg = %d;" /*AND eta = \"%s\";"*/,
+				 vm_param[i],vm_param[i],vm_param[i],vm_param[i],vm_param[i],fTableName,vm_param[i],fEnergy,fExperiment,fCentrality,fPDG); //fEta
     TSQLStatement* stmt = kServer->Statement(sql_statement.Data(),2048);
     n=0;
 
