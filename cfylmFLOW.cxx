@@ -174,7 +174,7 @@ int main(int argc, char** argv){
     mko = (tmt / tm) * (mko - (tpt / tmt) * met);
 
     Double_t mkv = TMath::Sqrt(mko*mko + mks*mks + mkl*mkl);
-    if(mkv<0.5) fCylm->AddRealPair(mko,mks,mkl,1.0);
+    if(mkv<1) fCylm->AddRealPair(mko,mks,mkl,1.0);
 
     /***** creating den histogram **************/
     phi1 = gRandom->Rndm()*TMath::TwoPi() - TMath::Pi();
