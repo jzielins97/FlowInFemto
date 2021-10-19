@@ -99,7 +99,7 @@ Int_t FemtoFlowDatabase::DownloadGraphs(){
   Double_t sysP = 0;
   this->fPT[0] = 10.0; //begining of the pT range
   this->fPT[1] = 0.0; // end of the pT range
-  for(Int_t i=0; i<2;i++){
+  for(Int_t i=0; i<1;i++){ //not looking for v3 anymore
     TString sql_statement = Form("SELECT pT, pT_LOW, pT_HIGH, %s, %s_statM, %s_statP, %s_sysM, %s_sysP FROM %s WHERE %s IS NOT NULL AND energy = %f AND experiment = \"%s\" AND centrality = \"%s\" AND pdg = %d;" /*AND eta = \"%s\";"*/,
 				 vm_param[i],vm_param[i],vm_param[i],vm_param[i],vm_param[i],fTableName,vm_param[i],fEnergy,fExperiment,fCentrality,fPDG); //fEta
     TSQLStatement* stmt = kServer->Statement(sql_statement.Data(),2048);
@@ -164,7 +164,7 @@ from the databse.
 *******************************************/
   void FemtoFlowDatabase::GetVms(Double_t pT, Double_t eta){
     
-    fVm[0] = - 0.75/0.8 * 10e-3 * eta;
+    fVm[0] = 0.0; //- 0.75/0.8 * 10e-3 * eta; (estimate for v1 for pion-kaon)
     fVm[1] = 0.0;  // v2
     fVm[2] = 0.0;  // v3 - not using anymore (19.10.2021 jzielins)
     
@@ -172,7 +172,7 @@ from the databse.
       fVm[i+1] = fVmGraph[i]->Eval(pT);
     }
 
-    fVm[3] = 0.5 * fVm[2];;  // v4 is not in the database (yet)
+    fVm[3] = 0.0;
     //std::cout<<fVm[0]<<" "<<fVm[1]<<" "<<fVm[2]<<" "<<fVm[3]<<std::endl;
   }
 
