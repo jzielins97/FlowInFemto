@@ -114,7 +114,7 @@ int main(int argc, char** argv){
   int N = atoi(argv[5]);
   std::cout<<"N="<<N<<std::endl;
 
-  fCylm = new CorrFctnDirectYlm("Cylm",1,nBins,0.0,0.5);
+  fCylm = new CorrFctnDirectYlm("Cylm",1,nBins,0.0,1);
   fCylm->AddToList(fOutput);
 
   ROOT::Math::PtEtaPhiM4D<double> v1(1, 1, 1, 1);
@@ -132,7 +132,7 @@ int main(int argc, char** argv){
     
     Double_t pt1 = h_pt1->GetRandom();
     Double_t pt2 = h_pt2->GetRandom();
-    while(pt1 < 0.19 || pt1 > 1.5) pt1 = h_pt1->GetRandom();
+    while(pt1 < 0.18 || pt1 > 1.5) pt1 = h_pt1->GetRandom();
     while(pt2 < 0.8 || pt2 > 2.2) pt2 = h_pt2->GetRandom();
 
     Double_t eta1 = 2. * (gRandom->Rndm() - 0.5) * 0.8;
@@ -212,7 +212,7 @@ int main(int argc, char** argv){
     mko = (tmt / tm) * (mko - (tpt / tmt) * met);
           
     mkv = TMath::Sqrt(mko*mko + mks*mks + mkl*mkl);
-    if(mkv < 0.5) fCylm->AddMixedPair(mko,mks,mkl,1.0);
+    if(mkv < 1) fCylm->AddMixedPair(mko,mks,mkl,1.0);
 
     if((i+1)%1000 == 0){
       printf("\r%6d/%d",i+1,N);

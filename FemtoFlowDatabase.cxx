@@ -166,9 +166,9 @@ from the databse.
     
     fVm[0] = - 0.75/0.8 * 10e-3 * eta;
     fVm[1] = 0.0;  // v2
-    fVm[2] = 0.0;  // v3
+    fVm[2] = 0.0;  // v3 - not using anymore (19.10.2021 jzielins)
     
-    for(int i=0; i<2;i++){
+    for(int i=0; i<1;i++){
       fVm[i+1] = fVmGraph[i]->Eval(pT);
     }
 
