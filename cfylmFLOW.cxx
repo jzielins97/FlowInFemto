@@ -84,7 +84,10 @@ int main(int argc, char** argv){
   
   //geting pT distribution histogram
   fin1 = new TFile(argv[2]);
-  //fin1->GetObject("hpt",h_pt1);
+  if(!fin1->GetListOfKeys()->Contains("hpt")){
+    std::cout<<"Error: there is no object called \"hpt\" in "<<argv[2]<<". Make sure that momentum distribution histogram is called \"hpt\"."<<std::endl;
+    return -1;
+  }
   h_pt1 = (TH1F*)fin1->Get("hpt")->Clone("hpt1");
   std::cout<<"\tThere are "<<h_pt1->GetEntries()<<" entries in the pT histogram"<<std::endl;
   
@@ -106,7 +109,10 @@ int main(int argc, char** argv){
 
   //geting pT distribution histogram  
   fin2 = new TFile(argv[4]);
-  // fin2->GetObject("hpt",h_pt2);
+  if(!fin2->GetListOfKeys()->Contains("hpt")){
+    std::cout<<"Error: there is no object called \"hpt\" in "<<argv[2]<<". Make sure that momentum distribution histogram is called \"hpt\"."<<std::endl;
+    return -1;
+  }
   h_pt2 = (TH1F*)fin2->Get("hpt")->Clone("hpt2");
   std::cout<<"\tThere are "<<h_pt2->GetEntries()<<" entries in the pT histogram"<<std::endl;
 /* end of setting up database ********************/
@@ -214,7 +220,7 @@ int main(int argc, char** argv){
     mkv = TMath::Sqrt(mko*mko + mks*mks + mkl*mkl);
     if(mkv < 1) fCylm->AddMixedPair(mko,mks,mkl,1.0);
 
-    if((i+1)%1000 == 0){
+    if((i+1)%(int)(0.01*N) == 0){
       printf("\r%6d/%d",i+1,N);
       fflush(stdout);
     }
