@@ -36,7 +36,7 @@ Double_t GetMass(int pdg){
 
 int main(int argc, char** argv){
   gRandom->SetSeed(0); //set new seed each time you run the program
-  int nBins = 50;
+  int nBins = 100; //50;
   int pdg1, pdg2;
   TFile* fin1;
   TFile* fin2;
@@ -132,7 +132,7 @@ int main(int argc, char** argv){
     
     Double_t pt1 = h_pt1->GetRandom();
     Double_t pt2 = h_pt2->GetRandom();
-    while(pt1 < 0.18 || pt1 > 1.5) pt1 = h_pt1->GetRandom();
+    while(pt1 < 0.17 || pt1 > 1.5) pt1 = h_pt1->GetRandom();
     while(pt2 < 0.8 || pt2 > 2.2) pt2 = h_pt2->GetRandom();
 
     Double_t eta1 = 2. * (gRandom->Rndm() - 0.5) * 0.8;

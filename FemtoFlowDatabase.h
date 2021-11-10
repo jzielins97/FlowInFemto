@@ -60,7 +60,7 @@ public:
 //setters
   void SetCentrality(const char* centrality){ fCentrality = centrality; };
   void SetEnergy(Double_t energy){ fEnergy = energy; };
-  void SetEta(const char* eta){ fEta = eta; };
+  void SetEta(const char* eta);
   void SetExperimentName(const char* experiment){ fExperiment = experiment; };
   void SetTableName(const char* tableName){ fTableName = tableName; };
 //getters

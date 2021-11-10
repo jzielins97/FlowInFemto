@@ -50,7 +50,8 @@ FemtoFlowDatabase::FemtoFlowDatabase( Int_t pdg, const char* tableName, Double_t
   fCentrality = centrality;
   fExperiment = experiment;
   fEnergy = energy;
-  fEta = eta;
+  if(strcmp(eta,"*") == 0) fEta = "%%";
+  else fEta = eta;
 
   fVmGraph[0] = new TGraphErrors();
   fVmGraph[0]->SetTitle(Form("v_{2} for %d;p_{T} (GeV);v_{2}", pdg));
@@ -100,8 +101,8 @@ Int_t FemtoFlowDatabase::DownloadGraphs(){
   this->fPT[0] = 10.0; //begining of the pT range
   this->fPT[1] = 0.0; // end of the pT range
   for(Int_t i=0; i<1;i++){ //not looking for v3 anymore
-    TString sql_statement = Form("SELECT pT, pT_LOW, pT_HIGH, %s, %s_statM, %s_statP, %s_sysM, %s_sysP FROM %s WHERE %s IS NOT NULL AND energy = %f AND experiment = \"%s\" AND centrality = \"%s\" AND pdg = %d;" /*AND eta = \"%s\";"*/,
-				 vm_param[i],vm_param[i],vm_param[i],vm_param[i],vm_param[i],fTableName,vm_param[i],fEnergy,fExperiment,fCentrality,fPDG); //fEta
+    TString sql_statement = Form("SELECT pT, pT_LOW, pT_HIGH, %s, %s_statM, %s_statP, %s_sysM, %s_sysP FROM %s WHERE %s IS NOT NULL AND energy = %f AND experiment = \"%s\" AND centrality = \"%s\" AND pdg = %d AND eta LIKE \"%s\";",
+				 vm_param[i],vm_param[i],vm_param[i],vm_param[i],vm_param[i],fTableName,vm_param[i],fEnergy,fExperiment,fCentrality,fPDG, fEta);
     TSQLStatement* stmt = kServer->Statement(sql_statement.Data(),2048);
     n=0;
 
@@ -203,4 +204,9 @@ void FemtoFlowDatabase::ShowParams(){
   }else{
     std::cout<<"ERROR::database not connected"<<std::endl;
   }
+}
+
+void FemtoFlowDatabase::SetEta(const char* eta){
+  if(strcmp(eta,"*") == 0) fEta = "%%";
+  else fEta = eta;
 }
