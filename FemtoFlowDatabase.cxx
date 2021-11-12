@@ -10,7 +10,7 @@
 Double_t flowHarmonics(Double_t *x, Double_t *par)
 {
     Double_t val = 1.;
-    for (Int_t i = 0; i < 4; i++)
+    for (Int_t i = 1; i < 2; i++)
     {
         val += 2. * par[i] * TMath::Cos((i + 1.) * x[0]);
     }
@@ -20,7 +20,7 @@ Double_t flowHarmonics(Double_t *x, Double_t *par)
 Double_t flowIntegral(Double_t *x, Double_t *par)
 {
   Double_t val = x[0];
-  for(Int_t i=0; i<4; i++)
+  for(Int_t i=1; i<2; i++)
   {
     val += 2. * par[i] / (i+1.) * TMath::Sin((i + 1.) * x[0]);
     //val += par[i] * TMath::ASin((i + 2.) * x[0] / 2.0) / (i + 2.);
@@ -165,7 +165,7 @@ from the databse.
 *******************************************/
   void FemtoFlowDatabase::GetVms(Double_t pT, Double_t eta){
     
-    fVm[0] = 0.0; //- 0.75/0.8 * 10e-3 * eta; (estimate for v1 for pion-kaon)
+    fVm[0] = 0.0;  // - 0.75/0.8 * 10e-3 * eta; //(estimate for v1 for pion-kaon)
     fVm[1] = 0.0;  // v2
     fVm[2] = 0.0;  // v3 - not using anymore (19.10.2021 jzielins)
     
