@@ -397,8 +397,9 @@ int readCSVnotHist(const char* fileName, TSQLServer* server, TString tName, TStr
   }
 
   std::string line, colname;
-  double value, pT, pT_low, pT_high, v, sysP, sysM, statP, statM;
-  double pT_last = 0.0;
+  std::vector<double> pT, v, sysP, sysM, statP, statM;
+  double value, pT_low, pT_high;
+  // double pT_last = 0.0;
   if(file.good()){
     std::getline(file,line);
     while(std::getline(file,line)){
@@ -406,26 +407,31 @@ int readCSVnotHist(const char* fileName, TSQLServer* server, TString tName, TStr
       //csv file is saved as: pT, v2, stat +, stat-, sys +, sys -
       int colID = 0;
       while(ss>>value){
-      	if(colID == 0){
-           pT = value;
-           pT_low = pT_last;
-           pT_high = pT;
-         }
-      	if(colID == 1) v = value;
-        if(colID == 2) statP = value;
-        if(colID == 3) statM = value;
-        if(colID == 4) sysP = value;
-        if(colID == 5) sysM = value;
+      	if(colID == 0) pT.push_back(value);
+      	if(colID == 1) v.push_back(value);
+        if(colID == 2) statP.push_back(value);
+        if(colID == 3) statM.push_back(value);
+        if(colID == 4) sysP.push_back(value);
+        if(colID == 5) sysM.push_back(value);
 
       	if(ss.peek() == ',') ss.ignore();
       	colID++;
       }
-      insertData(server, tName, v_param, energy, centrality, eta, pT, pT_low, pT_high, v, statP, statM, sysP, sysM, reference, experiment);
-      entries++;
       //std::cout<<pT<<" "<<v2<<std::endl;
     }
   }
-
+  for(int i=0; i<pT.size(); i++){
+    if(i==0){
+      pT_high = (pT.at(i) + pT.at(i+1))/2.;
+      pT_low = pT.at(i) - (pT.at(i+1) - pT.at(i))/2.;
+    }else{
+      pT_low = (pT.at(i-1) + pT.at(i))/2.;
+      pT_high = pT.at(i) + (pT.at(1) - pT.at(i-1))/2.;
+    }
+    // std::cout<<pT_low<<" "<<pT.at(i)<<" "<<pT_high<<std::endl;
+    if(insertData(server, tName, v_param, energy, centrality, eta, pT.at(i), pT_low, pT_high, v.at(i), statP.at(i), statM.at(i), sysP.at(i), sysM.at(i), reference, experiment)) entries++;
+  }
+  
   return entries;
 }
 
