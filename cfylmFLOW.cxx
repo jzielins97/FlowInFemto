@@ -45,9 +45,18 @@ int main(int argc, char** argv){
   TH1F* h_pt1=0;
   TH1F* h_pt2=0;
 
+  TH2D* h_scan_part1; // pT of particle one with k* < 0.04
+  TH2D* h_scan_part2; // pT of particle one with k* < 0.04
+
   CorrFctnDirectYlm* fCylm;
   FemtoFlowDatabase* dFlowPart1;
   FemtoFlowDatabase* dFlowPart2;
+  Int_t grPos = FemtoFlowDatabase::kCentral;
+
+  Double_t pt1_min = 0.19;
+  Double_t pt1_max = 1.5;
+  Double_t pt2_min = 0.19;
+  Double_t pt2_max = 1.5;
 
   // Double_t massPi = 0.139570;
   // Double_t massK = 0.493677;
@@ -59,13 +68,14 @@ int main(int argc, char** argv){
 
   if(argc < 6){
     std::cout<<"Error: not enough arguments. Needs: 5, was given: "<<argc-1<<"."<<std::endl;
-    std::cout<<"<particle #1 pdg> <pT distribution file #1> <particle #2 pdg> <pT distribution #2> <N> --optional <centrality> <eta> <energy> <experiment>"<<std::endl;
+    std::cout<<"<particle #1 pdg> <pT distribution file #1> <particle #2 pdg> <pT distribution #2> <N> --optional <Graph Position> <centrality> <eta> <energy> <experiment>"<<std::endl;
     return -1;
   }
   if(argc > 6) centrality = argv[6];
-  if(argc > 7) eta = argv[7];
-  if(argc > 8) sNN = atof(argv[8]);
-  if(argc > 9) experiment = argv[9];
+  if(argc > 7) grPos = atoi(argv[7]);
+  if(argc > 8) eta = argv[8];
+  if(argc > 9) sNN = atof(argv[9]);
+  if(argc > 10) experiment = argv[10];
 
 //setting up first particle
   //database:
@@ -77,6 +87,7 @@ int main(int argc, char** argv){
   dFlowPart1->SetEta(eta);
   dFlowPart1->SetTableName("PbPb");
   dFlowPart1->SetCentrality(centrality);
+  dFlowPart1->SetGraphPosition(grPos);
   dFlowPart1->ShowParams();
   std::cout<<"\tm1="<<massPart1<<std::endl;
   int foundVnForPart1 = dFlowPart1->DownloadGraphs();
@@ -89,8 +100,7 @@ int main(int argc, char** argv){
     return -1;
   }
   h_pt1 = (TH1F*)fin1->Get("hpt")->Clone("hpt1");
-  std::cout<<"\tThere are "<<h_pt1->GetEntries()<<" entries in the pT histogram"<<std::endl;
-  
+  std::cout<<"\tThere are "<<h_pt1->GetEntries()<<" entries in the pT histogram"<<std::endl;  
 
 //setting up second particle
   //database:
@@ -102,11 +112,12 @@ int main(int argc, char** argv){
   dFlowPart2->SetEta(eta);
   dFlowPart2->SetTableName("PbPb");
   dFlowPart2->SetCentrality(centrality);
+  dFlowPart2->SetGraphPosition(grPos);
   dFlowPart2->ShowParams();
   std::cout<<"\tm2="<<massPart2<<std::endl;
   int foundVnForPart2 = dFlowPart2->DownloadGraphs();
   std::cout<<"\tFor particle "<<pdg2<<" found "<<foundVnForPart2<<" v params"<<std::endl;
-
+  
   //geting pT distribution histogram  
   fin2 = new TFile(argv[4]);
   if(!fin2->GetListOfKeys()->Contains("hpt")){
@@ -116,8 +127,12 @@ int main(int argc, char** argv){
   h_pt2 = (TH1F*)fin2->Get("hpt")->Clone("hpt2");
   std::cout<<"\tThere are "<<h_pt2->GetEntries()<<" entries in the pT histogram"<<std::endl;
 /* end of setting up database ********************/
+
+  h_scan_part1 = new TH2D(Form("h_scan1_%d",pdg1), Form("%d;p_{T} [GeV/c^{2}];k* [GeV/c^{2}]",pdg1), (int)((pt1_max-pt1_min)*100),pt1_min,pt1_max,16,0.0,0.04);
+
+  h_scan_part2 = new TH2D(Form("h_scan2_%d",pdg2), Form("%d;p_{T} [GeV/c^{2}];k* [GeV/c^{2}]",pdg2), (int)((pt2_max-pt2_min)*100),pt2_min,pt2_max,16,0.0,0.04);
   
-  int N = atoi(argv[5]);
+  int N = (int)atof(argv[5]);
   std::cout<<"N="<<N<<std::endl;
 
   fCylm = new CorrFctnDirectYlm("Cylm",1,nBins,0.0,1);
@@ -135,17 +150,18 @@ int main(int argc, char** argv){
   std::cout << "Loop for filling the random" << std::endl;
   for (int i = 0; i < N; i++)
   {
+    Double_t psi3 = gRandom->Rndm() * TMath::TwoPi() - TMath::Pi(); // Reaction Plane angle for v3
     
     Double_t pt1 = h_pt1->GetRandom();
     Double_t pt2 = h_pt2->GetRandom();
-    while(pt1 < 0.17 || pt1 > 1.5) pt1 = h_pt1->GetRandom();
-    while(pt2 < 0.8 || pt2 > 2.2) pt2 = h_pt2->GetRandom();
+    while(pt1 < pt1_min || pt1 > pt1_max) pt1 = h_pt1->GetRandom();
+    while(pt2 < pt2_min || pt2 > pt2_max) pt2 = h_pt2->GetRandom();
 
     Double_t eta1 = 2. * (gRandom->Rndm() - 0.5) * 0.8;
     Double_t eta2 = 2. * (gRandom->Rndm() - 0.5) * 0.8;
     
-    Double_t phi1 = dFlowPart1->GetPhi(pt1, eta1);
-    Double_t phi2 = dFlowPart2->GetPhi(pt2, eta2);
+    Double_t phi1 = dFlowPart1->GetPhi(pt1, psi3);
+    Double_t phi2 = dFlowPart2->GetPhi(pt2, psi3);
 
 
     v1.SetCoordinates(pt1, eta1, phi1, massPart1);
@@ -181,6 +197,10 @@ int main(int argc, char** argv){
 
     Double_t mkv = TMath::Sqrt(mko*mko + mks*mks + mkl*mkl);
     if(mkv<1) fCylm->AddRealPair(mko,mks,mkl,1.0);
+    if(mkv<0.04){
+      h_scan_part1->Fill(pt1, mkv);
+      h_scan_part2->Fill(pt2, mkv);
+    }
 
     /***** creating den histogram **************/
     phi1 = gRandom->Rndm()*TMath::TwoPi() - TMath::Pi();
@@ -248,29 +268,24 @@ int main(int argc, char** argv){
 
   std::cout<<"Saving database statistics"<<std::endl;
   fout = new TFile("database_stats.root","RECREATE");
+  fout->cd();
+  dFlowPart1->GetGraph(FemtoFlowDatabase::kV2)->Write("hV2_pi");
+  dFlowPart1->GetGraph(FemtoFlowDatabase::kV3)->Write("hV3_pi");
   dFlowPart1->GetStatsHisto()->Write("hStats_pi");
+  h_scan_part1->Write();
+  dFlowPart2->GetGraph(FemtoFlowDatabase::kV2)->Write("hV2_K");
+  dFlowPart2->GetGraph(FemtoFlowDatabase::kV3)->Write("hV3_K");
   dFlowPart2->GetStatsHisto()->Write("hStats_K");
+  h_scan_part2->Write();
   fout->Close();
 
   //fCylm->Wrie();
 
-  // std::cout<<"its time to delete"<<std::endl;
-  // std::cout<<"\tfout"<<std::endl;
   delete fout;
-  // std::cout<<"\th_pt1"<<std::endl;
   delete h_pt1;
-  // std::cout<<"\th_pt2"<<std::endl;
   delete h_pt2;
-  // std::cout<<"\tfin1"<<std::endl;
   delete fin1;
-  // std::cout<<"\tfin2"<<std::endl;
   delete fin2;
-  // std::cout<<"\tdFlowPart1"<<std::endl;
-  //delete dFlowPart1;
-  //std::cout<<"\tdFlowPart2"<<std::endl;
-  //delete dFlowPart2;
-  //std::cout<<"\tfCylm"<<std::endl;
-  //delete fCylm;
   std::cout<<"done"<<std::endl;
 
 
